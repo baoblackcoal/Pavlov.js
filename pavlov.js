@@ -1,7 +1,7 @@
 'use strict';
 
 function countSteps(observation, reward, P_, R_) {
-  var stepReward = reward/observation.length;
+  var stepReward = reward / observation.length;
 
   observation.forEach(function(step, i) {
     //initialization
@@ -30,7 +30,7 @@ function getTransProbsFromCount(P_) {
     Object.keys(P_[state]).forEach(function(action) {
       var visitCount = Object.keys(P_[state][action]).reduce(function(sum, state_) {
         return sum + P_[state][action][state_];
-      },0);
+      }, 0);
       Object.keys(P_[state][action]).forEach(function(state_) {
         P_[state][action][state_] = P_[state][action][state_] / visitCount;
       });
@@ -48,27 +48,26 @@ var rewardsAndTransitions = module.exports.rewardsAndTransitions = function(obse
     countSteps(observation, rewards[i], P_, R_);
   });
 
-  var R = getRewardsFromCount(R_);
   var P = getTransProbsFromCount(P_);
+  var R = getRewardsFromCount(R_);
 
   return [P, R];
 };
 
-var ITERATIONS = Math.pow(10, 3);
 
-function policyFormatted(P, R) {
-  var policy = {}
+function policyFromRewardsAndTransitions(P, R) {
+  var ITERATIONS = Math.pow(10, 3);
+  var policy = {};
   var V = {};
   Object.keys(R).forEach(function(state) {
     V[state] = 0;
   });
 
-  var val;
   for (var i = 0; i < ITERATIONS; i++) {
     Object.keys(P).forEach(function(state) {
       var futureVal = -Infinity;
       Object.keys(P[state]).forEach(function(action) {
-        val = 0;
+        var val = 0;
         //assume uniform transition probabilities if no data is available
         if (Object.keys(P[state][action]).length == 0) {
           var states = Object.keys(P);
@@ -76,7 +75,7 @@ function policyFormatted(P, R) {
           states.forEach(function(state_) {
             P[state][action][state_] = uniformProb;
           });
-        }
+        };
         Object.keys(P[state][action]).forEach(function(state_) {
           val += (P[state][action][state_] * V[state_]);
         });
@@ -93,5 +92,5 @@ function policyFormatted(P, R) {
 
 var policy = module.exports.policy = function(observations, rewards) {
   var MDP = rewardsAndTransitions(observations, rewards);
-  return policyFormatted(MDP[0], MDP[1]);
+  return policyFromRewardsAndTransitions(MDP[0], MDP[1]);
 };
