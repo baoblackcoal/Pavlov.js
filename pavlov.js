@@ -1,11 +1,11 @@
 'use strict';
 
-function countSteps(observation, reward , P_, R_) {
+function countSteps(observation, reward, P_, R_) {
   var stepReward = reward/observation.length;
 
   observation.forEach(function(step, i) {
     //initialization
-    R_[step.state] = R_[step.state] || {reward:0, count:0};
+    R_[step.state] = R_[step.state] || { reward: 0, count: 0 };
     P_[step.state] = P_[step.state] || {};
     P_[step.state][step.action] = P_[step.state][step.action] || {};
 
@@ -13,7 +13,7 @@ function countSteps(observation, reward , P_, R_) {
     R_[step.state].reward += stepReward;
     R_[step.state].count += 1;
     //and visit count
-    if (i < observation.length - 1) P_[step.state][step.action][observation[i+1].state] = P_[step.state][step.action][observation[i+1].state] + 1 || 1;
+    if (i < observation.length - 1) P_[step.state][step.action][observation[i + 1].state] = P_[step.state][step.action][observation[i + 1].state] + 1 || 1;
   });
 };
 
@@ -54,23 +54,25 @@ var rewardsAndTransitions = module.exports.rewardsAndTransitions = function(obse
   return [P, R];
 };
 
-function checkConverge(V, V_) {
-  var totalDif = 0;
-  var totalOld = 0;
-  Object.keys(V).forEach(function(state) {
-    totalDif += Math.abs(V[state] - V_[state]);
-    totalOld += Math.abs(V_[state]);
-  });
-  return (totalDif < 0.001 * totalOld)
-};
+// function checkConverge(V, V_) {
+//   var totalDif = 0;
+//   var totalOld = 0;
+//   Object.keys(V).forEach(function(state) {
+//     totalDif += Math.abs(V[state] - V_[state]);
+//     totalOld += Math.abs(V_[state]);
+//   });
+//   return (totalDif < 0.001 * totalOld)
+// };
 
-function copyObj(obj) {
-  var obj_ = {};
-  Object.keys(obj).forEach(function(key) {
-    obj_[key] = obj[key];
-  });
-  return obj_;
-};
+// function copyObj(obj) {
+//   var obj_ = {};
+//   Object.keys(obj).forEach(function(key) {
+//     obj_[key] = obj[key];
+//   });
+//   return obj_;
+// };
+
+var ITERATIONS = Math.pow(10, 3);
 
 function policyFormatted(P, R) {
   var policy = {}
@@ -80,9 +82,9 @@ function policyFormatted(P, R) {
   });
 
   var val;
-  var notConverged = true;
-  while (notConverged) {
-    var V_ = copyObj(V);
+  // var notConverged = true;
+  for (var i = 0; i < ITERATIONS; i++) {
+    // var V_ = copyObj(V);
     Object.keys(P).forEach(function(state) {
       var futureVal = -Infinity;
       Object.keys(P[state]).forEach(function(action) {
@@ -105,7 +107,7 @@ function policyFormatted(P, R) {
         V[state] = R[state] + futureVal;
       });
     });
-    notConverged = !checkConverge(V, V_);
+    // notConverged = !checkConverge(V, V_);
   };
   return policy;
 };
