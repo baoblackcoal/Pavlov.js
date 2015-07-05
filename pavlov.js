@@ -54,24 +54,6 @@ var rewardsAndTransitions = module.exports.rewardsAndTransitions = function(obse
   return [P, R];
 };
 
-// function checkConverge(V, V_) {
-//   var totalDif = 0;
-//   var totalOld = 0;
-//   Object.keys(V).forEach(function(state) {
-//     totalDif += Math.abs(V[state] - V_[state]);
-//     totalOld += Math.abs(V_[state]);
-//   });
-//   return (totalDif < 0.001 * totalOld)
-// };
-
-// function copyObj(obj) {
-//   var obj_ = {};
-//   Object.keys(obj).forEach(function(key) {
-//     obj_[key] = obj[key];
-//   });
-//   return obj_;
-// };
-
 var ITERATIONS = Math.pow(10, 3);
 
 function policyFormatted(P, R) {
@@ -82,9 +64,7 @@ function policyFormatted(P, R) {
   });
 
   var val;
-  // var notConverged = true;
   for (var i = 0; i < ITERATIONS; i++) {
-    // var V_ = copyObj(V);
     Object.keys(P).forEach(function(state) {
       var futureVal = -Infinity;
       Object.keys(P[state]).forEach(function(action) {
@@ -107,7 +87,6 @@ function policyFormatted(P, R) {
         V[state] = R[state] + futureVal;
       });
     });
-    // notConverged = !checkConverge(V, V_);
   };
   return policy;
 };
