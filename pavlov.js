@@ -96,7 +96,7 @@ function policyFormatted(P,R){
           });
         }
         Object.keys(P[state][action]).forEach(function(state_){
-          val += (P[state][action][state_] * V[state_]);
+          val += 0.9*(P[state][action][state_] * V[state_]);
         });
         if (val > futureVal){
           futureVal = val;
