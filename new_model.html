@@ -1,0 +1,122 @@
+<html>
+<head>
+  <title>minimal demo</title>
+
+  <!-- CSS goes here -->
+  <style>
+    body {
+        background-color: #FFF; /* example... */
+    }
+  </style>
+
+  <!-- import convnetjs library -->
+  <script src="pavlov.js"></script>
+
+  <!-- javascript goes here -->
+  <script type="text/javascript">
+
+    function tick() {
+
+
+        // prints 0.50374
+    }
+    var randi = function(a, b) {
+      return Math.floor(Math.random()*(b-a)+a);
+    }
+
+    function start() {
+      //pointA = {state:"B", {action:"L", state:"A"},{action:"D", state:"D"} };
+
+      var pointB = {state:"B", action:[] };
+      pointB.action.push({action:"L", state:"A"});
+      pointB.action.push({action:"B", state:"D"});
+
+      var pointD = {state:"D", action:[] };
+      pointD.action.push({action:"L", state:"C"});
+      pointD.action.push({action:"F", state:"B"});
+
+      var pointA = {state:"A", action:[] };
+      pointA.action.push({action:"L", state:"Prize"});
+      pointA.action.push({action:"B", state:"C"});
+      pointA.action.push({action:"R", state:"B"});
+
+      var pointC = {state:"C", action:[] };
+      pointC.action.push({action:"R", state:"D"});
+      pointC.action.push({action:"F", state:"A"});
+
+      var point = [pointA, pointB, pointC, pointD];
+
+      agentState = "B";
+      var observations = [];
+      var rewards = [];
+      var cnt = 0;
+      var action_end = "L";
+      while (1) {
+        var agentStatePre = agentState;
+        var hasNextState = 0;
+        for (var i=0; i<point.length; i++) {
+          if (agentState === point[i].state) {
+            var n = randi(0, point[i].action.length);
+            agentState = point[i].action[n].state;
+            for (var j=0; j<point.length; j++) {
+              if(agentState === point[j].state ) {
+                action_end = point[j].action[randi(0, point[j].action.length)];
+              }
+            }
+            hasNextState = 1;
+
+            console.log("cnt =", cnt, ":", agentStatePre, point[i].action[n].action, agentState);
+
+            observations.push([{state:agentStatePre, action:point[i].action[n].action}, {state:agentState, action:action_end}]);
+
+            cnt++;
+            break;
+          }
+        }
+
+        if (!hasNextState) {
+          break;
+        }
+
+      }
+
+      for(var i=0; i<cnt-1; i++) {
+        rewards[i] = 0;
+      }
+      rewards[cnt-1] = 1;
+
+
+      console.log(observations, rewards);
+      console.log(policy(observations, rewards));
+
+
+      //console.log(pointA.action[randi(0,pointA.action.length)]);
+//
+      var obs1 = [{state:"A", action:"R"}, {state:"B", action:"B"}];
+      var obs2 = [{state:"A", action:"B"}, {state:"C", action:"R"}];
+      var obs3 = [{state:"A", action:"L"}, {state:"Prize", action:"R"}, {state:"Trap", action:"F"}];
+      var obs4 = [{state:"A", action:"L"}, {state:"Prize", action:"L"},{state:"Trap", action:"B"}];
+      var obs5 = [{state:"B",action:"B"},{state:"D",action:"L"}, {state: "C",action:"F"}, {state:"A",action:"R"}];
+      var obs6 = [{state:"C",action:"R"},{state:"D",action:"F"},{state:"B", action:"L"}, {state:"A", action:"L"}];
+
+      observations = [obs1,obs2,obs3,obs4,obs5,obs6];
+      rewards = [0,0,1,1,0,0];
+
+      console.log(observations, rewards);
+
+      console.log(policy(observations, rewards));
+// { A: 'L', B: 'L', C: 'F', Prize: 'R', Trap: 'B', D: 'L' }
+
+
+
+          // example of running something every 1 second
+          //setInterval(periodic, 100);
+      }
+
+  </script>
+</head>
+
+<body onload="start()">
+<div id="egdiv"></div>
+</body>
+</html>

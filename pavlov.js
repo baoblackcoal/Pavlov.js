@@ -39,7 +39,8 @@ function getTransProbsFromCount(P_){
   return P_;
 };
 
-var rewardsAndTransitions = module.exports.rewardsAndTransitions = function(observations,rewards){
+//var rewardsAndTransitions = module.exports.rewardsAndTransitions = function(observations,rewards){
+function rewardsAndTransitions(observations,rewards){
 
   var P_ = {};
   var R_ = {};
@@ -61,7 +62,8 @@ function isConverged(V,V_){
     totalDif += Math.abs(V[state] - V_[state]);
     totalOld += Math.abs(V_[state]);
   });
-  return (totalDif < 0.001*totalOld)
+  return (totalDif < 0.1*totalOld)
+  //return (totalDif < 0.001*totalOld)
 };
 
 function copyObj(obj){
@@ -81,7 +83,9 @@ function policyFormatted(P,R){
 
   var val;
   var notConverged = true;
+  var cnt = 0;
   while (notConverged){
+    cnt++;
     var V_ = copyObj(V);
     Object.keys(P).forEach(function(state){
       var futureVal = -Infinity;
@@ -96,7 +100,7 @@ function policyFormatted(P,R){
           });
         }
         Object.keys(P[state][action]).forEach(function(state_){
-          val += 0.9*(P[state][action][state_] * V[state_]);
+          val += (P[state][action][state_] * V[state_]);
         });
         if (val > futureVal){
           futureVal = val;
@@ -106,11 +110,17 @@ function policyFormatted(P,R){
       });
     });
     notConverged = !isConverged(V,V_);
+    //console.log(cnt);
+
+    //if (cnt > 1000){
+    //  break;
+    //}
   };
   return policy;
 };
 
-var policy = module.exports.policy = function(observations, rewards){
+//var policy = module.exports.policy = function(observations, rewards){
+function policy(observations, rewards){
   var MDP = rewardsAndTransitions(observations, rewards);
   return policyFormatted(MDP[0], MDP[1]);
 };
