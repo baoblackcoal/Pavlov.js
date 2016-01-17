@@ -60,7 +60,8 @@
             agentState = point[i].action[n].state;
             for (var j=0; j<point.length; j++) {
               if(agentState === point[j].state ) {
-                action_end = point[j].action[randi(0, point[j].action.length)];
+               // var m =
+                action_end = point[j].action[randi(0, point[j].action.length)].action;
               }
             }
             hasNextState = 1;

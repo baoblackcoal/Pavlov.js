@@ -62,8 +62,7 @@ function isConverged(V,V_){
     totalDif += Math.abs(V[state] - V_[state]);
     totalOld += Math.abs(V_[state]);
   });
-  return (totalDif < 0.1*totalOld)
-  //return (totalDif < 0.001*totalOld)
+  return (totalDif < 0.001*totalOld);
 };
 
 function copyObj(obj){
@@ -100,7 +99,7 @@ function policyFormatted(P,R){
           });
         }
         Object.keys(P[state][action]).forEach(function(state_){
-          val += (P[state][action][state_] * V[state_]);
+          val += 0.9*(P[state][action][state_] * V[state_]);
         });
         if (val > futureVal){
           futureVal = val;
@@ -110,17 +109,19 @@ function policyFormatted(P,R){
       });
     });
     notConverged = !isConverged(V,V_);
-    //console.log(cnt);
 
     //if (cnt > 1000){
     //  break;
     //}
   };
+  console.log(cnt);
+
   return policy;
 };
 
 //var policy = module.exports.policy = function(observations, rewards){
 function policy(observations, rewards){
   var MDP = rewardsAndTransitions(observations, rewards);
+  console.log(MDP);
   return policyFormatted(MDP[0], MDP[1]);
 };
