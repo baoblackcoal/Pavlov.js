@@ -74,7 +74,7 @@ function copyObj(obj){
 };
 
 function policyFormatted(P,R){
-  var policy = {}
+  var policy = {};
   var V = {};
   Object.keys(R).forEach(function(state){
     V[state] = 0;
@@ -110,11 +110,11 @@ function policyFormatted(P,R){
     });
     notConverged = !isConverged(V,V_);
 
-    //if (cnt > 1000){
-    //  break;
-    //}
+    if (cnt > 1000){
+      break;
+    }
   };
-  console.log(cnt);
+  //console.log(cnt);
 
   return policy;
 };
@@ -122,6 +122,6 @@ function policyFormatted(P,R){
 //var policy = module.exports.policy = function(observations, rewards){
 function policy(observations, rewards){
   var MDP = rewardsAndTransitions(observations, rewards);
-  console.log(MDP);
+  //console.log(MDP);
   return policyFormatted(MDP[0], MDP[1]);
 };

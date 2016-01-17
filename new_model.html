@@ -24,6 +24,15 @@
       return Math.floor(Math.random()*(b-a)+a);
     }
 
+    function isEmpty(obj)
+    {
+      for (var name in obj)
+      {
+        return false;
+      }
+      return true;
+    };
+
     function start() {
       //pointA = {state:"B", {action:"L", state:"A"},{action:"D", state:"D"} };
 
@@ -45,68 +54,127 @@
       pointC.action.push({action:"F", state:"A"});
 
       var point = [pointA, pointB, pointC, pointD];
-
-      agentState = "B";
       var observations = [];
-      var rewards = [];
       var cnt = 0;
-      var action_end = "L";
-      while (1) {
-        var agentStatePre = agentState;
-        var hasNextState = 0;
-        for (var i=0; i<point.length; i++) {
-          if (agentState === point[i].state) {
-            var n = randi(0, point[i].action.length);
-            agentState = point[i].action[n].state;
-            for (var j=0; j<point.length; j++) {
-              if(agentState === point[j].state ) {
-               // var m =
-                action_end = point[j].action[randi(0, point[j].action.length)].action;
+
+      var policyT = {};
+      for (var index=0; index<5; index++) {
+        var agentState = "B";
+        var rewards = [];
+        var actionEnd = "L";
+//      console.log("policyT=", isEmpty(policyT));
+        var n;
+        var stateEnd;
+        var statePolicy;
+
+        while (1) {
+          var agentStatePre = agentState;
+          var hasNextState = 0;
+          for (var i = 0; i < point.length; i++) {
+            if (agentState === point[i].state) {
+              hasNextState = 1;
+
+              //策略
+              n = randi(0, point[i].action.length);
+              if (!isEmpty(policyT)) {
+                for (actionI = 0; actionI < point[i].action.length; actionI++) {
+                  if (point[i].action[actionI].action === policyT[point[i].state] && Math.random() < 0.8) {
+                    n = actionI;
+                    break;
+                  }
+                }
+              }
+
+              //策略后的状态及整合对象（“前状态、动作、后状态和后状态能做的一个随机动作动作”做为一组参数）
+              agentState = point[i].action[n].state;
+              for (var j = 0; j < point.length; j++) {
+                if (agentState === point[j].state) {
+                  actionEnd = point[j].action[randi(0, point[j].action.length)].action;
+                }
+              }
+              console.log("cnt =", cnt, ":", agentStatePre, point[i].action[n].action, agentState);
+              observations.push([{state: agentStatePre, action: point[i].action[n].action}, {
+                state: agentState,
+                action: actionEnd
+              }]);
+              rewards[cnt] = 0;
+              cnt++;
+              break;
+            }
+          }
+
+          if (!hasNextState) {
+            stateEnd = agentState;
+            break;
+          }
+
+        }
+
+//        for (var i = 0; i < cnt - 1; i++) {
+//          rewards[i] = 0;
+//        }
+        rewards[cnt - 1] = 1;
+
+
+//      console.log(observations, rewards);
+//      console.log(policy(observations, rewards));
+
+        policyT = policy(observations, rewards);
+        console.log("observations length=", observations.length, "policyT=", policyT);
+
+        //计算所有状态的总共步长
+        var stepTotal = 0;
+        for (statePolicy in policyT) {
+          agentState = statePolicy;
+          console.log("Now state:", statePolicy, policyT[statePolicy]);
+
+          var actionI;
+          while (1) {
+            hasNextState = 0;
+            for (var i = 0; i < point.length; i++) {
+              if (agentState === point[i].state) {
+                for (actionI = 0; actionI < point[i].action.length; actionI++) {
+                  if (point[i].action[actionI].action === policyT[agentState]) {
+                    break;
+                  }
+                }
+                //if (point[i].action[actionI].state === 'undefined')
+                {
+                  console.log("undefined:", point[i].state, point[i].action[actionI].action);//, point[i].action[actionI].action)
+                }
+                agentState = point[i].action[actionI].state;
+                hasNextState = 1;
+                stepTotal++;
+                break;
               }
             }
-            hasNextState = 1;
-
-            console.log("cnt =", cnt, ":", agentStatePre, point[i].action[n].action, agentState);
-
-            observations.push([{state:agentStatePre, action:point[i].action[n].action}, {state:agentState, action:action_end}]);
-
-            cnt++;
-            break;
+            if (!hasNextState) {
+//              console.log(stepTotal);
+              break;
+            }
           }
         }
 
-        if (!hasNextState) {
-          break;
-        }
-
+        console.log("index(", index, ")=", stepTotal);
       }
 
-      for(var i=0; i<cnt-1; i++) {
-        rewards[i] = 0;
-      }
-      rewards[cnt-1] = 1;
-
-
-      console.log(observations, rewards);
-      console.log(policy(observations, rewards));
-
-
-      //console.log(pointA.action[randi(0,pointA.action.length)]);
 //
-      var obs1 = [{state:"A", action:"R"}, {state:"B", action:"B"}];
-      var obs2 = [{state:"A", action:"B"}, {state:"C", action:"R"}];
-      var obs3 = [{state:"A", action:"L"}, {state:"Prize", action:"R"}, {state:"Trap", action:"F"}];
-      var obs4 = [{state:"A", action:"L"}, {state:"Prize", action:"L"},{state:"Trap", action:"B"}];
-      var obs5 = [{state:"B",action:"B"},{state:"D",action:"L"}, {state: "C",action:"F"}, {state:"A",action:"R"}];
-      var obs6 = [{state:"C",action:"R"},{state:"D",action:"F"},{state:"B", action:"L"}, {state:"A", action:"L"}];
-
-      observations = [obs1,obs2,obs3,obs4,obs5,obs6];
-      rewards = [0,0,1,1,0,0];
-
-      console.log(observations, rewards);
-
-      console.log(policy(observations, rewards));
-// { A: 'L', B: 'L', C: 'F', Prize: 'R', Trap: 'B', D: 'L' }
+//      //console.log(pointA.action[randi(0,pointA.action.length)]);
+////
+//      var obs1 = [{state:"A", action:"R"}, {state:"B", action:"B"}];
+//      var obs2 = [{state:"A", action:"B"}, {state:"C", action:"R"}];
+//      var obs3 = [{state:"A", action:"L"}, {state:"Prize", action:"R"}, {state:"Trap", action:"F"}];
+//      var obs4 = [{state:"A", action:"L"}, {state:"Prize", action:"L"},{state:"Trap", action:"B"}];
+//      var obs5 = [{state:"B",action:"B"},{state:"D",action:"L"}, {state: "C",action:"F"}, {state:"A",action:"R"}];
+//      var obs6 = [{state:"C",action:"R"},{state:"D",action:"F"},{state:"B", action:"L"}, {state:"A", action:"L"}];
+//
+//      observations = [obs1,obs2,obs3,obs4,obs5,obs6];
+//      rewards = [0,0,1,1,0,0];
+//
+////      console.log(observations, rewards);
+//
+//      console.log(policy(observations, rewards));
+//// { A: 'L', B: 'L', C: 'F', Prize: 'R', Trap: 'B', D: 'L' }
 
 
 
