@@ -7,6 +7,9 @@ var Experience = module.exports.Experience = function(state0, action0, reward0, 
 	this.state1 = state1;
 }
 
+var experienceR = {};
+var experienceP = {};
+
 function countSteps(experience,P_,R_){
 
   experience.forEach(function(step,i){
@@ -34,23 +37,31 @@ function getRewardsFromCount(R_){
  // console.log(R_);
   Object.keys(R_).forEach(function(state){
 	//console.log("R_:", state, R_[state].reward);
+	experienceR[state] = experienceR[state] || 0;
     R[state] = R_[state].reward / R_[state].count;
+	experienceR[state] += R[state];
   });
-  return R;
+//  return R;
+  return experienceR;
 };
 
 function getTransProbsFromCount(P_){
   Object.keys(P_).forEach(function(state){
+	  experienceP[state] = experienceP[state] || {};
     Object.keys(P_[state]).forEach(function(action){
+		experienceP[state][action] = experienceP[state][action] || {};
       var visitCount = Object.keys(P_[state][action]).reduce(function(sum,state_){
         return sum + P_[state][action][state_];
       },0);
       Object.keys(P_[state][action]).forEach(function(state_){
+		experienceP[state][action][state_] = experienceP[state][action][state_] || 0;
         P_[state][action][state_] = P_[state][action][state_] / visitCount;
-      });
+		experienceP[state][action][state_] += P_[state][action][state_];
+	  });
     });
   });
-  return P_;
+//  return P_;
+	return experienceP;
 };
 
 var rewardsAndTransitions = module.exports.rewardsAndTransitions = function(experience){
@@ -134,6 +145,6 @@ function policyFormatted(P,R){
 
 var policy = module.exports.policy = function(experience){
 	var MDP = rewardsAndTransitions(experience);
-	console.log(MDP);
+	console.log(MDP[0]);
 	return policyFormatted(MDP[0], MDP[1]);
 };
