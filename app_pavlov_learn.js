@@ -1,6 +1,7 @@
 var pavlov = require('./pavlov_learn.js');
 
 //var e = new Experience();
+/*
 var e1 = new pavlov.Experience("B", "L", 0, "A");
 var e2 = new pavlov.Experience("A", "L", 1, "Prize");
 var e3 = new pavlov.Experience("B", "B", 0, "D");
@@ -11,6 +12,8 @@ var e7 = new pavlov.Experience("D", "R", 0, "C");
 var e8 = new pavlov.Experience("C", "F", 0, "A");
 var e9 = new pavlov.Experience("C", "R", 0, "D");
 var e10 = new pavlov.Experience("A", "R", 0, "B");
+
+var e1 = new pavlov.Experience("B", "L", 0, "A");
 
 var e = [];
 e.push(e1);
@@ -27,18 +30,65 @@ e.push(e9);
 e.push(e10);
 
 console.log(pavlov.policy(e));
-/*
-var obs1 = [{state:"A", action:"R"}, {state:"B", action:"B"}];
-var obs2 = [{state:"A", action:"B"}, {state:"C", action:"R"}];
-var obs3 = [{state:"A", action:"L"}, {state:"Prize", action:"R"}, {state:"Trap", action:"F"}];
-var obs4 = [{state:"A", action:"L"}, {state:"Prize", action:"L"},{state:"Trap", action:"B"}];
-var obs5 = [{state:"B",action:"B"},{state:"D",action:"L"}, {state: "C",action:"F"}, {state:"A",action:"R"}];
-var obs6 = [{state:"C",action:"R"},{state:"D",action:"F"},{state:"B", action:"L"}, {state:"A", action:"L"}];
-
-observations = [obs1,obs2,obs3,obs4,obs5,obs6];
-rewards = [0,0,1,1,0,0];
-
-console.log(pavlov.policy(observations,rewards));
-
-// { A: 'L', B: 'L', C: 'F', Prize: 'R', Trap: 'B', D: 'L' }
 */
+
+//闭环校正
+//动作 1 -1 2 -2
+//状态 1 2 3 4
+//目标要达到3
+function state0ActionToState1(state0, action){
+	var state1 = 0;
+	
+	state1 = state0 + action;
+//	if (action == -1)
+//		state1 = state0 - 1;
+//	else if (action == 1)
+//		state1 = state0 + 1;
+	
+	if (state1 < 1)
+		state1 = 1;
+	if (state1 > 4)
+		state1 = 4;
+	
+	if (state1 == 3)
+		rewards = 1;
+	else
+		rewards = 0;
+	
+	return [rewards, state1];
+}
+
+var State1 = 0;
+ret = state0ActionToState1(2, 1)
+console.log(ret[0], ret[1]);
+var state0 = 1, action =1;
+
+state0 = 1, action =2;
+ret = state0ActionToState1(state0, action)
+var e1 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+state0 = 1, action =1;
+ret = state0ActionToState1(state0, action)
+var e2 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+state0 = 3, action =2;
+ret = state0ActionToState1(state0, action)
+var e3 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+state0 = 4, action =1;
+ret = state0ActionToState1(state0, action)
+var e4 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+state0 = 4, action =-1;
+ret = state0ActionToState1(state0, action)
+var e5 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+state0 = 3, action =-2;
+ret = state0ActionToState1(state0, action)
+var e6 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+//console.log(e1);
+
+var e = [];
+e.push(e1);
+e.push(e2);
+e.push(e3);
+e.push(e4);
+e.push(e5);
+e.push(e6);
+console.log(pavlov.policy(e));
+ 

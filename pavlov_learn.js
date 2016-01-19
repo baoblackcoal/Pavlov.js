@@ -145,6 +145,6 @@ function policyFormatted(P,R){
 
 var policy = module.exports.policy = function(experience){
 	var MDP = rewardsAndTransitions(experience);
-	console.log(MDP[0]);
+	//console.log(MDP[0]);
 	return policyFormatted(MDP[0], MDP[1]);
 };
