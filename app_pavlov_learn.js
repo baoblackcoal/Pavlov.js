@@ -1,36 +1,42 @@
-var pavlov = require('./pavlov_learn.js');
+var pl = require('./pavlov_learn.js');
+
+//±³°üÎÊÌâ
+//ÎïÆ·£ºA B C
+//ÖØÁ¿£º28 12 12
+//¼ÛÖµ£º30 20 20
+//Ô¼Êø£ºÖØÁ¿²»ÄÜ´óÓÚ30
+//Ä¿±ê£º¼ÛÖµ×î´ó
+//pl.experienceReset();
 
 
-//èƒŒåŒ…é—®é¢˜
-//ç‰©å“ï¼šA B C
-//é‡é‡ï¼š28 12 12
-//ä»·å€¼ï¼š30 20 20
-//çº¦æŸï¼šé‡é‡ä¸èƒ½å¤§äº30
-//ç›®æ ‡ï¼šä»·å€¼æœ€å¤§
-pavlov.experienceReset();
+//var dqn = new pl.Brain();
+//console.log("dqn=", dqn.getValue());
 
+//var e = new pl.Experience1(1, 2,3,4 );
+//console.log("e=", e);
 
-var e1 = new pavlov.Experience("B", "L", 0, "A");
-var e2 = new pavlov.Experience("A", "L", 1, "Prize");
-var e3 = new pavlov.Experience("B", "B", 0, "D");
-var e4 = new pavlov.Experience("D", "F", 0, "B");
-var e5 = new pavlov.Experience("Prize", "L", 0, "A");
-//var e6 = new pavlov.Experience("D", "L", 1, "Prize");
-var e7 = new pavlov.Experience("D", "R", 0, "C");
-var e8 = new pavlov.Experience("C", "F", 0, "A");
-var e9 = new pavlov.Experience("C", "R", 0, "D");
-var e10 = new pavlov.Experience("A", "R", 0, "B");
+var e1 = new pl.Experience("B", "L", 0, "A");
+var e2 = new pl.Experience("A", "L", 1, "Prize");
+var e3 = new pl.Experience("B", "B", -1, "D");
+var e4 = new pl.Experience("D", "F", 0, "B");
+var e5 = new pl.Experience("Prize", "L", 0, "A");
+//var e6 = new pl.Experience("D", "L", 1, "Prize");
+var e7 = new pl.Experience("D", "R", 0, "C");
+var e8 = new pl.Experience("C", "F", 0, "A");
+var e9 = new pl.Experience("C", "R", -1, "D");
+var e10 = new pl.Experience("A", "R", 0, "B");
 
-var e1 = new pavlov.Experience("B", "L", 0, "A");
+var e1 = new pl.Experience("B", "L", 0, "A");
 
-pavlov.experienceReset();
+var brain = new pl.Brain();
+brain.experienceReset();
 var e = [];
 e.push(e1);
 e.push(e2);
 e.push(e3);
 e.push(e4);
 e.push(e5);
-console.log(pavlov.policy(e));
+console.log(brain.policy(e));
 var e = [];
 //e.push(e6);
 e.push(e1);
@@ -42,26 +48,26 @@ e.push(e7);
 e.push(e8);
 e.push(e9);
 e.push(e10);
-console.log(pavlov.policy(e));
+console.log(brain.policy(e));
 
 /*
-pavlov.experienceReset();
-var e1 = new pavlov.Experience({a:1, b:1}, 1, 0, {a:2, b:2});
-var e2 = new pavlov.Experience({a:2, b:2}, 1, 1, {a:3, b:3});
-var e3 = new pavlov.Experience({a:3, b:3}, -1, 1, {a:2, b:2});
+pl.experienceReset();
+var e1 = new pl.Experience({a:1, b:1}, 1, 0, {a:2, b:2});
+var e2 = new pl.Experience({a:2, b:2}, 1, 1, {a:3, b:3});
+var e3 = new pl.Experience({a:3, b:3}, -1, 1, {a:2, b:2});
 var e = [];
 e.push(e1);
 e.push(e2);
 e.push(e3);
-var p = pavlov.policy(e)
+var p = pl.policy(e)
 console.log(p);
 */
 
 /*
-//é—­ç¯æ ¡æ­£
-//åŠ¨ä½œ 1 -1 2 -2
-//çŠ¶æ€ 1 2 3 4
-//ç›®æ ‡è¦è¾¾åˆ°3
+//±Õ»·Ğ£Õı
+//¶¯×÷ 1 -1 2 -2
+//×´Ì¬ 1 2 3 4
+//Ä¿±êÒª´ïµ½3
 function state0ActionToState1(state0, action){
 	var state1 = 0;
 	
@@ -91,22 +97,22 @@ var state0 = 1, action =1;
 
 state0 = 1, action =2;
 ret = state0ActionToState1(state0, action)
-var e1 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+var e1 = new pl.Experience(state0, action, ret[0], ret[1]);
 state0 = 1, action =1;
 ret = state0ActionToState1(state0, action)
-var e2 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+var e2 = new pl.Experience(state0, action, ret[0], ret[1]);
 state0 = 3, action =2;
 ret = state0ActionToState1(state0, action)
-var e3 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+var e3 = new pl.Experience(state0, action, ret[0], ret[1]);
 state0 = 4, action =1;
 ret = state0ActionToState1(state0, action)
-var e4 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+var e4 = new pl.Experience(state0, action, ret[0], ret[1]);
 state0 = 4, action =-1;
 ret = state0ActionToState1(state0, action)
-var e5 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+var e5 = new pl.Experience(state0, action, ret[0], ret[1]);
 state0 = 3, action =-2;
 ret = state0ActionToState1(state0, action)
-var e6 = new pavlov.Experience(state0, action, ret[0], ret[1]);
+var e6 = new pl.Experience(state0, action, ret[0], ret[1]);
 //console.log(e1);
 
 var e = [];
@@ -116,5 +122,5 @@ e.push(e3);
 e.push(e4);
 e.push(e5);
 e.push(e6);
-console.log(pavlov.policy(e));
+console.log(pl.policy(e));
  */
