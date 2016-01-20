@@ -33,12 +33,10 @@ function countSteps(experience,P_,R_){
 		});
 		state0Replace += "}";
 		state1Replace += "}";
-		console.log("state0Replace:",state0Replace);
-		console.log("state1Replace:",state1Replace);
+//		console.log("state0Replace:",state0Replace);
+//		console.log("state1Replace:",state1Replace);
 	}
 
-
-	
     //initialization
     R_[state0Replace] = R_[state0Replace] || {reward:0, count:0};
 	R_[state1Replace] = R_[state1Replace] || {reward:0, count:0};
@@ -81,6 +79,7 @@ function getTransProbsFromCount(P_){
 		experienceP[state][action][state_] = experienceP[state][action][state_] || 0;
         P_[state][action][state_] = P_[state][action][state_] / visitCount;
 		experienceP[state][action][state_] += P_[state][action][state_];
+//		console.log(experienceP);
 	  });
     });
   });
@@ -111,6 +110,7 @@ function isConverged(V,V_){
     totalDif += Math.abs(V[state] - V_[state]);
     totalOld += Math.abs(V_[state]);
   });
+//  console.log("totalDif:",totalDif,"totalOld:",0.001*totalOld);
   return (totalDif < 0.001*totalOld)
 };
 
@@ -132,36 +132,38 @@ function policyFormatted(P,R){
   var val;
   var notConverged = true;
   var notAction = true;
-  while (notConverged){
+  var cnt = 0;
+  var futureVal;
+  while (notConverged){	
     var V_ = copyObj(V);
+	cnt++;
     Object.keys(P).forEach(function(state){
-      var futureVal = -Infinity;
+      futureVal = -Infinity;
 	  notAction = true;
       Object.keys(P[state]).forEach(function(action){
-		notAction = false;
         val = 0;
-//        //assume uniform transition probabilities if no data is available
-//        if (Object.keys(P[state][action]).length == 0){
-//          var states = Object.keys(P);
-//          var uniformProb = 1/states.length;
-//          states.forEach(function(state_){
-//            P[state][action][state_] = uniformProb;
-//          });
-//        }
         Object.keys(P[state][action]).forEach(function(state_){
-          val += 0.9*(P[state][action][state_] * V[state_]);
+          val += 0.111*(P[state][action][state_] * V[state_]);
         });
+		//console.log("val=", val);
+
         if (val > futureVal){
           futureVal = val;
           policy[state] = action;
         }
-        V[state] = R[state] + futureVal;
+		V[state] = R[state] + futureVal;
       });
-	  if (notAction) V[state] = R[state] + 0.9*V[state];
+	  if (notAction) V[state] = R[state] + 0.111*V[state];
     });
-    notConverged = !isConverged(V,V_);
+	
+	notConverged = !isConverged(V,V_);
+//	if (cnt > 10) {
+//		console.log("cnt=",cnt);
+//		break;
+//	}
   };
   console.log("V:", V);
+//  console.log("cnt=",cnt);
 
   return policy;
 };
