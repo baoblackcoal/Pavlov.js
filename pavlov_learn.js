@@ -1,5 +1,8 @@
 'use strict';
 
+var experienceR = {};
+var experienceP = {};
+
 var Experience = module.exports.Experience = function(state0, action0, reward0, state1) {
 	this.state0 = state0;
 	this.action0 = action0;
@@ -7,28 +10,49 @@ var Experience = module.exports.Experience = function(state0, action0, reward0, 
 	this.state1 = state1;
 }
 
-var experienceR = {};
-var experienceP = {};
+var experienceReset = module.exports.experienceReset = function() {
+	experienceR = {};
+	experienceP = {};
+}
 
 function countSteps(experience,P_,R_){
 
   experience.forEach(function(step,i){
 	var stepReward = step.reward0/2;
+	var state0Replace, state1Replace;
+	state0Replace = step.state0;
+	state1Replace = step.state1;
+	
+	if(typeof step.state0 === "object") {
+		state0Replace="{ ", state1Replace="{ ";
+		Object.keys(step.state0).forEach(function(i){
+			state0Replace += step.state0[i];
+			state0Replace += " ";
+			state1Replace += step.state1[i];
+			state1Replace += " ";
+		});
+		state0Replace += "}";
+		state1Replace += "}";
+		console.log("state0Replace:",state0Replace);
+		console.log("state1Replace:",state1Replace);
+	}
 
+
+	
     //initialization
-    R_[step.state0] = R_[step.state0] || {reward:0, count:0};
-	R_[step.state1] = R_[step.state1] || {reward:0, count:0};
-    P_[step.state0] = P_[step.state0] || {};
-    P_[step.state0][step.action0] = P_[step.state0][step.action0] || {};
-	P_[step.state1] = P_[step.state1] || {};
+    R_[state0Replace] = R_[state0Replace] || {reward:0, count:0};
+	R_[state1Replace] = R_[state1Replace] || {reward:0, count:0};
+    P_[state0Replace] = P_[state0Replace] || {};
+    P_[state0Replace][step.action0] = P_[state0Replace][step.action0] || {};
+	P_[state1Replace] = P_[state1Replace] || {};
 
     //increment total reward count
-    R_[step.state0].reward += stepReward;
-    R_[step.state0].count += 1;
-	R_[step.state1].reward += stepReward;
-    R_[step.state1].count += 1;
+    R_[state0Replace].reward += stepReward;
+    R_[state0Replace].count += 1;
+	R_[state1Replace].reward += stepReward;
+    R_[state1Replace].count += 1;
     //and visit count
-     P_[step.state0][step.action0][step.state1] = P_[step.state0][step.action0][step.state1] + 1 || 1;
+     P_[state0Replace][step.action0][state1Replace] = P_[state0Replace][step.action0][state1Replace] + 1 || 1;
   });
 };
 
