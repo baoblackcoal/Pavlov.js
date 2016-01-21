@@ -65,14 +65,16 @@
         var state0 = t.state;
         var reward = 0;
         var actionI = t.agent.forward(state0);
+        var forEachEnd = false;
 
         for (var i= 0; i<t.stateAndAction.length; i++) {
 //          console.log(this.stateAndAction[0]["A"]);
           Object.keys(t.stateAndAction[i]).forEach(function(state) {
             //console.log(t.stateAndAction[i][state]);
-            if (t.state === state) {
+            if (!forEachEnd && t.state === state) {
               Object.keys(t.stateAndAction[i][state]).forEach(function (action) {
-                if (t.actionALl[actionI] === action) {
+                if (!forEachEnd && t.actionALl[actionI] === action) {
+                  forEachEnd = true;
                   t.state = t.stateAndAction[i][state][action];
                   reward = t.reward(t.state);
                   console.log(state0, action, reward, t.state);
