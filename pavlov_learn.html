@@ -15,25 +15,110 @@
   <!-- javascript goes here -->
   <script type="text/javascript">
 
-    function tick() {
+    var World = function(){
+      this.clock = 0;
+      this.stateAll = ["A", "B", "C", "D", "Prize"];//Prize = 1 -> reward = 1 else reward = 0
+      this.stateA = {"A":{D:"C", U:"A", L:"Prize", R:"B"}};
+      this.stateB = {"B":{D:"D", U:"B", L:"A", R:"B"}};
+      this.stateC = {"C":{D:"C", U:"A", L:"C", R:"D"}};
+      this.stateD = {"D":{D:"D", U:"B", L:"C", R:"D"}};
+      this.statePrize = {Prize:{"D":"Prize", U:"Prize", L:"Prize", R:"A"}};
+      this.stateAndAction = [];
+      this.stateAndAction.push(this.stateA);
+      this.stateAndAction.push(this.stateB);
+      this.stateAndAction.push(this.stateC);
+      this.stateAndAction.push(this.stateD);
+      this.stateAndAction.push(this.statePrize);
 
+      this.actionALl = ["D", "U", "L", "R"];//down up left right
+      this.actionNumber = this.actionALl.length;
 
-        // prints 0.50374
-    }
-    var randi = function(a, b) {
-      return Math.floor(Math.random()*(b-a)+a);
-    }
+      this.actionI = 0;
+      this.action = this.actionALl[this.actionI];
+      this.state = this.stateAll[this.actionI];
+      this.agent = new Agent(this.actionNumber);
+    };
+    World.prototype = {
+      reward:function(state){
+        var ret = 0;
 
-    function isEmpty(obj)
-    {
-      for (var name in obj)
-      {
-        return false;
+        if(state === "Prize") {
+          ret = 1;
+        }
+
+        return ret;
+      },
+      //reset state when state == "Prize"
+      reset:function(){
+        var stateI;
+        if (this.state === "Prize") {
+          console.log("World reset!");
+          do {
+            stateI = randi(0, this.stateAll.length);
+            this.state = this.stateAll[stateI];
+          } while (this.state === "Prize")
+        }
+      },
+
+      rule:function(){
+        var t = this;//down up left right
+        var state0 = t.state;
+        var reward = 0;
+        var actionI = t.agent.forward(state0);
+
+        for (var i= 0; i<t.stateAndAction.length; i++) {
+//          console.log(this.stateAndAction[0]["A"]);
+          Object.keys(t.stateAndAction[i]).forEach(function(state) {
+            //console.log(t.stateAndAction[i][state]);
+            if (t.state === state) {
+              Object.keys(t.stateAndAction[i][state]).forEach(function (action) {
+                if (t.actionALl[actionI] === action) {
+                  t.state = t.stateAndAction[i][state][action];
+                  reward = t.reward(t.state);
+                  console.log(state0, action, reward, t.state);
+                }
+              });
+            }
+          });
+        }
+
+        t.agent.backward();
+
+        this.reset();
+      },
+
+      tick:function(){
+        this.clock++;
+//        console.log("clock = ", this.clock);
+
+        this.rule();
       }
-      return true;
     };
 
-    function start() {
+    var Agent = function(actionNumber) {
+      this.age = 0;
+      this.actionNumber = actionNumber;
+      this.brain = new pavlov_learn.Brain();
+    };
+    Agent.prototype = {
+      forward:function(){
+        return randi(0, this.actionNumber);
+      },
+      backward:function(reward){
+        this.age++;
+        console.log("age =", this.age);
+      }
+    };
+
+    function tick() {
+      w.tick();
+    }
+
+    var randi = function(a, b) {
+      return Math.floor(Math.random()*(b-a)+a);
+    };
+/*
+    function start_befor() {
       var e1 = new pavlov_learn.Experience("B", "L", 0, "A");
       var e2 = new pavlov_learn.Experience("A", "L", 1, "Prize");
       var e3 = new pavlov_learn.Experience("B", "B", -1, "D");
@@ -68,9 +153,12 @@
       e.push(e9);
       e.push(e10);
       console.log(brain.policy(e));
-
-// example of running something every 1 second
-//setInterval(periodic, 100);
+    }
+*/
+    var w;
+    function start() {
+      w = new World();
+      setInterval(tick, 300);
     }
 
   </script>
