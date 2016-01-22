@@ -9,13 +9,78 @@ var experienceP = {};
     this.action0 = action0;
     this.reward0 = reward0;
     this.state1 = state1;
-  }
+  };
 
-  var Brain = function(){};
+  var randi = function(a, b) {
+    return Math.floor(Math.random()*(b-a)+a);
+  };
+  var randf = function(a, b) {
+    return Math.random()*(b-a)+a;
+  };
+
+  var Brain = function(actionsNum, actionsAll){
+    this.actionsNum = actionsNum;
+    this.actionsALl = actionsAll;
+    this.forwardCnt = 0;
+    this.policy = {};
+    this.state0 = {};
+    this.state1 = {};
+    this.action0 = {};
+    this.reward0 = 0;
+    this.learnEnable = false;
+  };
   Brain.prototype = {
     experienceReset: function () {
       experienceR = {};
       experienceP = {};
+    },
+
+    learnRestart:function(){
+      console.log("learnRestart!!!!!!!");
+      this.learnEnable = false;
+    },
+
+    forward:function(state0){
+      var actionI = 0;
+      var t = this;
+      var forEachEnable = true;
+      var randAction = true;
+      t.state0 = state0;
+
+      this.forwardCnt++;
+      if (this.forwardCnt > 1) {
+        if (randf(0,1) < 0.1) {
+          Object.keys(t.policy).forEach(function (state) {
+            if (forEachEnable && state === state0) {
+              console.log("policy action!");
+              forEachEnable = false;
+              randAction = false;
+              t.action0 = t.policy[state];
+            }
+          });
+        }
+      }
+
+      if(randAction) {
+        console.log("randi action!");
+        actionI = global.randi(0, this.actionsNum);
+        t.action0 = this.actionsALl[actionI];
+      }
+
+      return actionI;
+    },
+
+    backward:function(reward0, state1){
+      this.reward0 = reward0;
+      this.state1 = state1;
+
+      if(this.learnEnable && this.forwardCnt > 1){
+        var e = new Experience(this.state0, this.action0, this.reward0, this.state1);
+        //console.log("e:", e);
+        this.policyLearn([e]);
+      }
+
+      this.learnEnable = true;
     },
 
     countSteps: function (experience, P_, R_) {
@@ -103,12 +168,19 @@ var experienceP = {};
     isConverged: function (V, V_) {
       var totalDif = 0;
       var totalOld = 0;
+      var ret;
+
       Object.keys(V).forEach(function (state) {
         totalDif += Math.abs(V[state] - V_[state]);
         totalOld += Math.abs(V_[state]);
       });
 //  console.log("totalDif:",totalDif,"totalOld:",0.001*totalOld);
-      return (totalDif < 0.001 * totalOld)
+
+      if (Math.abs(totalDif) < 0.00001 && Math.abs(totalOld) < 0.00001){
+        return true;
+      } else {
+        return (totalDif < 0.001 * totalOld)
+      }
     },
 
     copyObj: function (obj) {
@@ -120,7 +192,7 @@ var experienceP = {};
     },
 
     policyFormatted: function (P, R) {
-      var policy = {};
+      var t = this;
       var V = {};
       Object.keys(R).forEach(function (state) {
         V[state] = 0;
@@ -143,40 +215,43 @@ var experienceP = {};
             Object.keys(P[state][action]).forEach(function (state_) {
               val += r * (P[state][action][state_] * V[state_]);
             });
+
             //console.log("val=", val);
 
             if (val > futureVal) {
               futureVal = val;
-              policy[state] = action;
+              t.policy[state] = action;
             }
             V[state] = R[state] + futureVal;
           });
           if (notAction) {
             V[state] = R[state] + r * V[state];
-            policy[state] = policy[state] || "NULL";
+            t.policy[state] = t.policy[state] || "NULL";
           }
         });
 
         notConverged = !this.isConverged(V, V_);
 
-//	if (cnt > 10) {
-//		console.log("cnt=",cnt);
-//		break;
-//	}
+        if (cnt > 100) {
+          console.log("cnt=",cnt);
+          break;
+        }
       }
 
-      console.log("V=", V);
       console.log("Loop cnt=", cnt);
-
-      return policy;
+      console.log("V=", V);
+      console.log("policy=", t.policy);
+      return t.policy;
     },
-    policy: function (experience) {
+
+    policyLearn: function (experience) {
       var MDP = this.rewardsAndTransitions(experience);
-      //console.log(MDP[0]);
+      console.log(MDP);
       return this.policyFormatted(MDP[0], MDP[1]);
     }
   };
 
+  global.randi = randi;
   global.Brain = Brain;
   global.Experience = Experience;
 })(pavlov_learn);

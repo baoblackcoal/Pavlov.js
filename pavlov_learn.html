@@ -23,20 +23,20 @@
       this.stateC = {"C":{D:"C", U:"A", L:"C", R:"D"}};
       this.stateD = {"D":{D:"D", U:"B", L:"C", R:"D"}};
       this.statePrize = {Prize:{"D":"Prize", U:"Prize", L:"Prize", R:"A"}};
-      this.stateAndAction = [];
-      this.stateAndAction.push(this.stateA);
-      this.stateAndAction.push(this.stateB);
-      this.stateAndAction.push(this.stateC);
-      this.stateAndAction.push(this.stateD);
-      this.stateAndAction.push(this.statePrize);
+      this.allStateAndAction = [];
+      this.allStateAndAction.push(this.stateA);
+      this.allStateAndAction.push(this.stateB);
+      this.allStateAndAction.push(this.stateC);
+      this.allStateAndAction.push(this.stateD);
+      this.allStateAndAction.push(this.statePrize);
 
       this.actionALl = ["D", "U", "L", "R"];//down up left right
-      this.actionNumber = this.actionALl.length;
+      this.actionsNum = this.actionALl.length;
 
       this.actionI = 0;
       this.action = this.actionALl[this.actionI];
       this.state = this.stateAll[this.actionI];
-      this.agent = new Agent(this.actionNumber);
+      this.agent = new Agent(this.actionsNum, this.actionALl);
     };
     World.prototype = {
       reward:function(state){
@@ -51,42 +51,55 @@
       //reset state when state == "Prize"
       reset:function(){
         var stateI;
+        var hasReset = false;
+
         if (this.state === "Prize") {
-          console.log("World reset!");
+          hasReset = true;
+          console.log("...................World reset!");
           do {
-            stateI = randi(0, this.stateAll.length);
+            stateI = pavlov_learn.randi(0, this.stateAll.length);
             this.state = this.stateAll[stateI];
           } while (this.state === "Prize")
         }
+
+        return hasReset;
       },
 
       rule:function(){
         var t = this;//down up left right
         var state0 = t.state;
-        var reward = 0;
-        var actionI = t.agent.forward(state0);
+        var reward0;
+        var action0;
+        var state1;
         var forEachEnd = false;
 
-        for (var i= 0; i<t.stateAndAction.length; i++) {
-//          console.log(this.stateAndAction[0]["A"]);
-          Object.keys(t.stateAndAction[i]).forEach(function(state) {
-            //console.log(t.stateAndAction[i][state]);
+        var actionI = t.agent.forward(state0);
+
+        for (var i= 0; i<t.allStateAndAction.length; i++) {
+//          console.log(this.allStateAndAction[0]["A"]);
+          Object.keys(t.allStateAndAction[i]).forEach(function(state) {
+            //console.log(t.allStateAndAction[i][state]);
             if (!forEachEnd && t.state === state) {
-              Object.keys(t.stateAndAction[i][state]).forEach(function (action) {
+              Object.keys(t.allStateAndAction[i][state]).forEach(function (action) {
                 if (!forEachEnd && t.actionALl[actionI] === action) {
                   forEachEnd = true;
-                  t.state = t.stateAndAction[i][state][action];
-                  reward = t.reward(t.state);
-                  console.log(state0, action, reward, t.state);
+                  t.state = t.allStateAndAction[i][state][action];
+                  state1 = t.state;
+                  reward0 = t.reward(state1);
+                  action0 = action;
+//                  console.log(state0, action, reward0, state1);
                 }
               });
             }
           });
         }
 
-        t.agent.backward();
+        console.log(state0, action0, reward0, state1);
+        t.agent.backward(reward0, t.state);
 
-        this.reset();
+        if(t.reset()){
+//          t.agent.brain.learnRestart();
+        }
       },
 
       tick:function(){
@@ -97,18 +110,19 @@
       }
     };
 
-    var Agent = function(actionNumber) {
+    var Agent = function(actionsNum, actionsAll) {
       this.age = 0;
-      this.actionNumber = actionNumber;
-      this.brain = new pavlov_learn.Brain();
+      this.brain = new pavlov_learn.Brain(actionsNum, actionsAll);
     };
     Agent.prototype = {
-      forward:function(){
-        return randi(0, this.actionNumber);
+      forward:function(state){
+        return this.brain.forward(state);
+//        return pavlov_learn.randi(0, this.actionsNum);
       },
-      backward:function(reward){
+      backward:function(reward0, state1){
         this.age++;
-        console.log("age =", this.age);
+        this.brain.backward(reward0, state1);
+//        console.log("age =", this.age);
       }
     };
 
@@ -116,49 +130,73 @@
       w.tick();
     }
 
-    var randi = function(a, b) {
-      return Math.floor(Math.random()*(b-a)+a);
-    };
-/*
+
+
     function start_befor() {
       var e1 = new pavlov_learn.Experience("B", "L", 0, "A");
       var e2 = new pavlov_learn.Experience("A", "L", 1, "Prize");
-      var e3 = new pavlov_learn.Experience("B", "B", -1, "D");
+      var e3 = new pavlov_learn.Experience("B", "B", 0, "D");
       var e4 = new pavlov_learn.Experience("D", "F", 0, "B");
 //var e5 = new pavlov_learn.Experience("Prize", "L", 0, "A");
 //var e6 = new pavlov_learn.Experience("D", "L", 1, "Prize");
       var e7 = new pavlov_learn.Experience("D", "L", 0, "C");
       var e8 = new pavlov_learn.Experience("C", "F", 0, "A");
-      var e9 = new pavlov_learn.Experience("C", "R", -1, "D");
+      var e9 = new pavlov_learn.Experience("C", "R", 0, "D");
       var e10 = new pavlov_learn.Experience("A", "R", 0, "B");
 
-      var e1 = new pavlov_learn.Experience("B", "L", 0, "A");
+      var e5 = new pavlov_learn.Experience("B", "F", 0, "B");
 
       var brain = new pavlov_learn.Brain();
       brain.experienceReset();
       var e = [];
       e.push(e1);
+      console.log(brain.policyLearn(e));
+      var e = [];
       e.push(e2);
+      console.log(brain.policyLearn(e));
+      var e = [];
       e.push(e3);
-      console.log(brain.policy(e));
+      console.log(brain.policyLearn(e));
 
       var e = [];
       e.push(e4);
+      console.log(brain.policyLearn(e));
+
+      var e = [];
+      e.push(e5);
+      console.log(brain.policyLearn(e));
 //e.push(e5);
 //e.push(e6);
+      var e = [];
       e.push(e1);
+      console.log(brain.policyLearn(e));
+      var e = [];
       e.push(e2);
+      console.log(brain.policyLearn(e));
+      var e = [];
       e.push(e3);
+      console.log(brain.policyLearn(e));
+      var e = [];
       e.push(e4);
+      console.log(brain.policyLearn(e));
+      var e = [];
       e.push(e7);
+      console.log(brain.policyLearn(e));
+      var e = [];
       e.push(e8);
+      console.log(brain.policyLearn(e));
+      var e = [];
       e.push(e9);
+      console.log(brain.policyLearn(e));
+      var e = [];
       e.push(e10);
-      console.log(brain.policy(e));
+      console.log(brain.policyLearn(e));
     }
-*/
+
     var w;
     function start() {
+//      start_befor();
+
       w = new World();
       setInterval(tick, 300);
     }
