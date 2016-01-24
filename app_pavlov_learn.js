@@ -34,21 +34,21 @@ var e = [];
 e.push(e1);
 e.push(e2);
 e.push(e3);
-console.log(brain.policy(e));
+console.log(brain.policyLearn(e));
 
-var e = [];
-e.push(e4);
-//e.push(e5);
-//e.push(e6);
-e.push(e1);
-e.push(e2);
-e.push(e3);
-e.push(e4);
-e.push(e7);
-e.push(e8);
-e.push(e9);
-e.push(e10);
-console.log(brain.policy(e));
+//var e = [];
+//e.push(e4);
+////e.push(e5);
+////e.push(e6);
+//e.push(e1);
+//e.push(e2);
+//e.push(e3);
+//e.push(e4);
+//e.push(e7);
+//e.push(e8);
+//e.push(e9);
+//e.push(e10);
+//console.log(brain.policyLearn(e));
 
 /*
 pavlov_learn.experienceReset();

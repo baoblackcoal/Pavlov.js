@@ -24,8 +24,8 @@
       <file leaf-file-name="pavlov_learn.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pavlov_learn.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-4.673077">
-              <caret line="81" column="26" selection-start-line="81" selection-start-column="26" selection-end-line="81" selection-end-column="26" />
+            <state vertical-scroll-proportion="-5.6538463">
+              <caret line="58" column="14" selection-start-line="58" selection-start-column="14" selection-end-line="58" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -34,8 +34,8 @@
       <file leaf-file-name="pavlov_learn.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pavlov_learn.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.4448598">
-              <caret line="104" column="9" selection-start-line="104" selection-start-column="9" selection-end-line="104" selection-end-column="9" />
+            <state vertical-scroll-proportion="0.23835126">
+              <caret line="255" column="15" selection-start-line="255" selection-start-column="15" selection-end-line="255" selection-end-column="15" />
               <folding />
             </state>
           </provider>
@@ -54,8 +54,8 @@
       <file leaf-file-name="app_pavlov_learn.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app_pavlov_learn.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="16.65306">
-              <caret line="12" column="38" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
+            <state vertical-scroll-proportion="-0.5102041">
+              <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="19" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -109,8 +109,8 @@
         <option value="$PROJECT_DIR$/pavlov.js" />
         <option value="$PROJECT_DIR$/new_model.html" />
         <option value="$PROJECT_DIR$/app_pavlov_learn.js" />
-        <option value="$PROJECT_DIR$/pavlov_learn.js" />
         <option value="$PROJECT_DIR$/pavlov_learn.html" />
+        <option value="$PROJECT_DIR$/pavlov_learn.js" />
       </list>
     </option>
   </component>
@@ -435,8 +435,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app_pavlov_learn.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="16.65306">
-          <caret line="12" column="38" selection-start-line="12" selection-start-column="38" selection-end-line="12" selection-end-column="38" />
+        <state vertical-scroll-proportion="-0.5102041">
+          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="19" selection-end-column="56" />
           <folding />
         </state>
       </provider>
@@ -451,16 +451,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/pavlov_learn.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-4.673077">
-          <caret line="81" column="26" selection-start-line="81" selection-start-column="26" selection-end-line="81" selection-end-column="26" />
+        <state vertical-scroll-proportion="-5.6538463">
+          <caret line="58" column="14" selection-start-line="58" selection-start-column="14" selection-end-line="58" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pavlov_learn.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.4448598">
-          <caret line="104" column="9" selection-start-line="104" selection-start-column="9" selection-end-line="104" selection-end-column="9" />
+        <state vertical-scroll-proportion="0.23835126">
+          <caret line="255" column="15" selection-start-line="255" selection-start-column="15" selection-end-line="255" selection-end-column="15" />
           <folding />
         </state>
       </provider>
