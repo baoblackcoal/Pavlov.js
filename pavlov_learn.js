@@ -19,20 +19,35 @@ var NoAction = "NA";
   var randi = function(a, b) {
     return Math.floor(Math.random()*(b-a)+a);
   };
+
   var randf = function(a, b) {
     return Math.random()*(b-a)+a;
   };
 
-  var Brain = function(actionsNum, actionsAll){
-    this.actionsNum = actionsNum;
-    this.actionsALl = actionsAll;
+  var Brain = function(actionsDescribeAll, opt){
+    opt = opt || {};
+    // how many steps of the above to perform only random actions (in the beginning)?
+    this.learning_steps_burnin = typeof opt.learning_steps_burnin !== 'undefined' ? opt.learning_steps_burnin : 100;
+    // what epsilon value do we bottom out on? 0.0 => purely deterministic policy at end
+    this.epsilon_min = typeof opt.epsilon_min !== 'undefined' ? opt.epsilon_min : 0.05;
+    // gamma(¦Ã) of MDP, gamma is a crucial parameter that controls how much plan-ahead the agent does. In [0,1]
+    this.gamma = typeof opt.gamma !== 'undefined' ? opt.gamma : 0.3;
+    this.batch_experience_learn_size = typeof opt.batch_experience_learn_size !== 'undefined' ? opt.batch_experience_learn_size : 32;
+
+    this.actionsDescribeAll = actionsDescribeAll;
+    this.actionsNum = actionsDescribeAll.length;
+
+    this.batchExperience = [];
     this.forwardCnt = 0;
     this.policy = {};
     this.state0 = {};
     this.state1 = {};
     this.action0 = {};
+    this.V = {};
     this.reward0 = 0;
-    this.learnEnable = false;
+    this.age = 0;
+    this.randActionCnt = 0;
+    this.policyActionCnt = 0;
     experienceR = {};
     experienceP = {};
   };
@@ -44,52 +59,67 @@ var NoAction = "NA";
 
     learnRestart:function(){
       console.log("learnRestart!!!!!!!");
-      this.learnEnable = false;
+    },
+
+    policyExecute:function(state0){
+      var t = this;
+      var forEachEnable = true;
+      var executed = false;
+
+      Object.keys(t.policy).forEach(function (state) {
+        if (forEachEnable && t.policy[state] !== NoAction && state === state0) {
+          //console.log("policy action!");
+          forEachEnable = false;
+          executed = true;
+          t.action0 = t.policy[state0];
+        }
+      });
+
+      return executed;
     },
 
     forward:function(state0){
       var actionI = 0;
-      var t = this;
       var forEachEnable = true;
-      var randAction = true;
-      t.state0 = state0;
+      var policyExecuted = false;
+      this.state0 = state0;
       //console.log("t.state0=", t.state0);
       this.forwardCnt++;
+      this.epsilon = Math.min(1.0, Math.max(this.epsilon_min, 1.0-(this.age - this.learning_steps_burnin)/this.age));
 
       if (this.forwardCnt > 1) {
-        if (randf(0,1) < 0.9) {
-          Object.keys(t.policy).forEach(function (state) {
-            if (forEachEnable && t.policy[state] !== NoAction && state === state0) {
-              //console.log("policy action!");
-              forEachEnable = false;
-              randAction = false;
-              t.action0 = t.policy[state0];
-            }
-          });
+        if (global.randf(0,1) > this.epsilon) {
+          policyExecuted = this.policyExecute(state0);
         }
       }
 
-      if(randAction || t.action0 === NoAction) {
+      if(!policyExecuted || this.action0 === NoAction) {
         //console.log("randi action!");
+        this.randActionCnt++;
         actionI = global.randi(0, this.actionsNum);
-        t.action0 = this.actionsALl[actionI];
+        this.action0 = this.actionsDescribeAll[actionI];
+      }else{
+        this.policyActionCnt++;
       }
+      //console.log("policyAction percent =", this.policyActionCnt/(this.policyActionCnt+this.randActionCnt)*100,"%");
 
-      return t.action0;
+      return this.action0;
     },
 
     backward:function(reward0, state1){
       this.reward0 = reward0;
       this.state1 = state1;
+      this.age++;
 
-      //if(this.learnEnable && this.forwardCnt > 1){
-        if (floatIs0(this.reward0)) this.reward0 = -0.1;
-        var e = new Experience(this.state0, this.action0, this.reward0, this.state1);
-        var ea = [];
-        ea.push(e);
-        //console.log(e);
-        this.policyLearn(ea);
-      //}
+      if (floatIs0(this.reward0)) this.reward0 = -0.1;
+      var e = new Experience(this.state0, this.action0, this.reward0, this.state1);
+      //console.log(e);
+      this.batchExperience.push(e);
+      if(this.batchExperience.length > this.batch_experience_learn_size) {
+        this.policyLearn(this.batchExperience);
+        this.batchExperience = [];
+      }
+
 
       this.learnEnable = true;
     },
@@ -163,7 +193,7 @@ var NoAction = "NA";
           });
         });
       });
-      //console.log("experienceP", experienceP);
+      console.log("experienceP", experienceP);
       return experienceP;
     },
 
@@ -206,9 +236,9 @@ var NoAction = "NA";
 
     policyFormatted: function (P, R) {
       var t = this;
-      var V = {};
+      t.V = {};
       Object.keys(R).forEach(function (state) {
-        V[state] = 0;
+        t.V[state] = 0;
       });
 
       var val;
@@ -216,10 +246,9 @@ var NoAction = "NA";
       var notAction = true;
       var cnt = 0;
       var futureVal;
-      var r = 0.555;
       var state1;
       while (notConverged) {
-        var V_ = this.copyObj(V);
+        var V_ = this.copyObj(t.V);
         cnt++;
         Object.keys(P).forEach(function (state) {
           futureVal = -Infinity;
@@ -228,7 +257,7 @@ var NoAction = "NA";
             notAction = false;
             val = 0;
             Object.keys(P[state][action].state1).forEach(function (state_) {
-              val += r * (P[state][action].state1[state_].p * V[state_]);
+              val += t.gamma * (P[state][action].state1[state_].p * t.V[state_]);
               state1 = state_;
               //console.log("P: ", state, action, state_, P[state][action].state1[state_].p);
             });
@@ -239,17 +268,17 @@ var NoAction = "NA";
               futureVal = val;
               t.policy[state] = action;
             }
-            V[state] = R[state] + futureVal;
+            t.V[state] = R[state] + futureVal;
           });
           //console.log("---------noatciont", notAction);
           if (notAction || t.policy[state] === NoAction) {
-            V[state] = R[state] + r * V[state];
+            t.V[state] = R[state] + t.gamma * t.V[state];
             t.policy[state] = t.policy[state] || NoAction;
             //t.policy[state] = {};
           }
         });
 
-        notConverged = !this.isConverged(V, V_);
+        notConverged = !this.isConverged(t.V, V_);
 
         if (cnt > 1000) {
           console.log("cnt=",cnt);
@@ -258,7 +287,7 @@ var NoAction = "NA";
       }
 
       console.log("Loop cnt=", cnt);
-      console.log("V=", V);
+      console.log("V=", t.V);
       console.log("policy=", t.policy);
       return t.policy;
     },
@@ -271,6 +300,7 @@ var NoAction = "NA";
   };
 
   global.randi = randi;
+  global.randf = randf;
   global.Brain = Brain;
   global.Experience = Experience;
 })(pavlov_learn);

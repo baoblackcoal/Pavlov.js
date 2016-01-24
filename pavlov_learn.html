@@ -30,13 +30,13 @@
       this.allStateAndAction.push(this.stateD);
       this.allStateAndAction.push(this.statePrize);
 
-      this.actionALl = ["D", "U", "L", "R"];//down up left right
-      this.actionsNum = this.actionALl.length;
+      this.actionsDescribeAll = ["D", "U", "L", "R"];//down up left right
+      this.actionsNum = this.actionsDescribeAll.length;
 
       this.actionI = 0;
-      this.action = this.actionALl[this.actionI];
+      this.action = this.actionsDescribeAll[this.actionI];
       this.state = this.stateAll[this.actionI];
-      this.agent = new Agent(this.actionsNum, this.actionALl);
+      this.agent = new Agent(this.actionsDescribeAll);
     };
     World.prototype = {
       reward:function(state){
@@ -109,9 +109,12 @@
       }
     };
 
-    var Agent = function(actionsNum, actionsAll) {
-      this.age = 0;
-      this.brain = new pavlov_learn.Brain(actionsNum, actionsAll);
+    var Agent = function(actionsDescribeAll) {
+      var opt = {};
+      opt.learning_steps_burnin = 100;
+      opt.gamma = 0.1;
+      opt.batch_experience_learn_size = 30;
+      this.brain = new pavlov_learn.Brain(actionsDescribeAll, opt);
     };
     Agent.prototype = {
       forward:function(state){
@@ -119,7 +122,6 @@
 //        return pavlov_learn.randi(0, this.actionsNum);
       },
       backward:function(reward0, state1){
-        this.age++;
         this.brain.backward(reward0, state1);
 //        console.log("age =", this.age);
       }
@@ -199,7 +201,7 @@
 //      start_befor();
 
       w = new World();
-      setInterval(tick, 100);
+      setInterval(tick, 10);
     }
 
   </script>

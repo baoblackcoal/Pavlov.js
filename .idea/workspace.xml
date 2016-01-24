@@ -24,8 +24,8 @@
       <file leaf-file-name="pavlov_learn.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pavlov_learn.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.6538463">
-              <caret line="58" column="14" selection-start-line="58" selection-start-column="14" selection-end-line="58" selection-end-column="14" />
+            <state vertical-scroll-proportion="-2.48">
+              <caret line="115" column="42" selection-start-line="115" selection-start-column="42" selection-end-line="115" selection-end-column="42" />
               <folding />
             </state>
           </provider>
@@ -34,8 +34,8 @@
       <file leaf-file-name="pavlov_learn.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pavlov_learn.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.23835126">
-              <caret line="255" column="15" selection-start-line="255" selection-start-column="15" selection-end-line="255" selection-end-column="15" />
+            <state vertical-scroll-proportion="0.4448598">
+              <caret line="104" column="0" selection-start-line="104" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -51,11 +51,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="app_pavlov_learn.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/app_pavlov_learn.js">
+      <file leaf-file-name="deepqlearn.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/build/deepqlearn.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.5102041">
-              <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="19" selection-end-column="56" />
+            <state vertical-scroll-proportion="12.461538">
+              <caret line="245" column="49" selection-start-line="245" selection-start-column="39" selection-end-line="245" selection-end-column="49" />
               <folding />
             </state>
           </provider>
@@ -64,18 +64,8 @@
       <file leaf-file-name="rldemo.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/demo/rldemo.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="90.23077">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="deepqlearn.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/build/deepqlearn.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-5.8461537">
-              <caret line="187" column="31" selection-start-line="186" selection-start-column="8" selection-end-line="187" selection-end-column="31" />
+            <state vertical-scroll-proportion="5.230769">
+              <caret line="82" column="21" selection-start-line="82" selection-start-column="4" selection-end-line="82" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -84,8 +74,8 @@
       <file leaf-file-name="convnet.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/build/convnet.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="186.38461">
-              <caret line="140" column="19" selection-start-line="140" selection-start-column="19" selection-end-line="140" selection-end-column="19" />
+            <state vertical-scroll-proportion="-10.423077">
+              <caret line="129" column="23" selection-start-line="129" selection-start-column="23" selection-end-line="129" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -310,7 +300,7 @@
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24758364" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19033457" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3289689" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32242227" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -401,34 +391,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/build/convnet.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="186.38461">
-          <caret line="140" column="19" selection-start-line="140" selection-start-column="19" selection-end-line="140" selection-end-column="19" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/demo/rldemo.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="90.23077">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/demo/js/rldemo.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-7.1538463">
           <caret line="322" column="13" selection-start-line="322" selection-start-column="6" selection-end-line="322" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/build/deepqlearn.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.8461537">
-          <caret line="187" column="31" selection-start-line="186" selection-start-column="8" selection-end-line="187" selection-end-column="31" />
           <folding />
         </state>
       </provider>
@@ -441,6 +407,22 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/build/convnet.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-10.423077">
+          <caret line="129" column="23" selection-start-line="129" selection-start-column="23" selection-end-line="129" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/demo/rldemo.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="5.230769">
+          <caret line="82" column="21" selection-start-line="82" selection-start-column="4" selection-end-line="82" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/src/convnet_util.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -449,18 +431,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../convnetjs/convnetjs/build/deepqlearn.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="12.461538">
+          <caret line="245" column="49" selection-start-line="245" selection-start-column="39" selection-end-line="245" selection-end-column="49" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/pavlov_learn.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-5.6538463">
-          <caret line="58" column="14" selection-start-line="58" selection-start-column="14" selection-end-line="58" selection-end-column="14" />
+        <state vertical-scroll-proportion="-2.48">
+          <caret line="115" column="42" selection-start-line="115" selection-start-column="42" selection-end-line="115" selection-end-column="42" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pavlov_learn.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.23835126">
-          <caret line="255" column="15" selection-start-line="255" selection-start-column="15" selection-end-line="255" selection-end-column="15" />
+        <state vertical-scroll-proportion="0.4448598">
+          <caret line="104" column="0" selection-start-line="104" selection-start-column="0" selection-end-line="104" selection-end-column="0" />
           <folding />
         </state>
       </provider>
