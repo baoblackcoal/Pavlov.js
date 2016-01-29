@@ -6,7 +6,7 @@
   <!-- CSS goes here -->
   <style>
     body {
-        background-color: #FFF; /* example... */
+      background-color: #FFF; /* example... */
     }
   </style>
 
@@ -16,80 +16,67 @@
   <!-- javascript goes here -->
   <script type="text/javascript">
 
-    var World = function(){
+    var World = function () {
       this.clock = 0;
       this.initial_real_adc_value = "1";
       this.initial_target_adc_value = "151";
       this.initial_dac_value = "1";
-      this.state = {dac_value:this.initial_dac_value,real_adc_value:this.initial_real_adc_value, target_adc_value:this.initial_target_adc_value};
+      this.state = {
+        dac_value: this.initial_dac_value,
+        real_adc_value: this.initial_real_adc_value,
+        target_adc_value: this.initial_target_adc_value
+      };
       this.real_adc_value_num = parseInt(this.state.real_adc_value);
       this.dac_value_num = parseInt(this.state.dac_value);
       this.dac_value_num_max = 1000;
       this.dac_value_num_min = 1;
       this.adc_value_num_max = 200;
       this.adc_value_num_min = 1;
-//      this.target_adc_value_num = parseInt(this.state.target_adc_value);
-//      this.agent_action = "0";
-//      this.agent_action_num = parseInt(this.agent_action);
 
-//      this.stateAll = ["A", "B", "C", "D", "Prize"];//Prize = 1 -> reward = 1 else reward = 0
-//      this.stateA = {"A":{D:"C", U:"A", L:"Prize", R:"B"}};
-//      this.stateB = {"B":{D:"D", U:"B", L:"A", R:"B"}};
-//      this.stateC = {"C":{D:"C", U:"A", L:"C", R:"D"}};
-//      this.stateD = {"D":{D:"D", U:"B", L:"C", R:"D"}};
-//      this.statePrize = {Prize:{"D":"Prize", U:"Prize", L:"Prize", R:"A"}};
-//      this.allStateAndAction = [];
-//      this.allStateAndAction.push(this.stateA);
-//      this.allStateAndAction.push(this.stateB);
-//      this.allStateAndAction.push(this.stateC);
-//      this.allStateAndAction.push(this.stateD);
-//      this.allStateAndAction.push(this.statePrize);
-//
-//      this.actionsDescribeAll = ["D", "U", "L", "R"];//down up left right
-//      this.actionsNum = this.actionsDescribeAll.length;
-//
-//      this.actionI = 0;
-//      this.action = this.actionsDescribeAll[this.actionI];
-//      this.state = this.stateAll[this.actionI];
       this.agent = new Agent();
     };
     World.prototype = {
-      dac_value_to_adc_value:function(dac_value_num){
+      dac_value_to_adc_value: function (dac_value_num) {
         this.dac_value_num += dac_value_num;
-        if(this.dac_value_num > this.dac_value_num_max){
+//        this.dac_value_num = dac_value_num;
+        if (this.dac_value_num > this.dac_value_num_max) {
           this.dac_value_num = this.dac_value_num_max;
-        } else if (this.dac_value_num < this.dac_value_num_min){
+        } else if (this.dac_value_num < this.dac_value_num_min) {
           this.dac_value_num = this.dac_value_num_min;
         }
 
         if (this.dac_value_num <= 200) {
           this.real_adc_value_num = this.adc_value_num_min;
-        }else if (this.dac_value_num > 600){
+        } else if (this.dac_value_num > 600) {
           this.real_adc_value_num = this.adc_value_num_max;
-        }else {
-          this.real_adc_value_num = 200 / (600-200) * (this.dac_value_num-200) + this.adc_value_num_min;
+        } else {
+          this.real_adc_value_num = 200 / (600 - 200) * (this.dac_value_num - 200) + this.adc_value_num_min;
           this.real_adc_value_num = Math.floor(this.real_adc_value_num);
         }
       },
 
-      reward:function(state1){
+      reward: function (state1) {
         var ret = 0;
 
-        if(state1.real_adc_value === state1.target_adc_value) {
-          ret = 1;
+        if (state1.real_adc_value === state1.target_adc_value) {
+              ret = 1;
         }
 
         return ret;
       },
       //reset state when state == "Prize"
-      reset:function(state1){
+      reset: function (state1) {
         var has_reset = false;
 
         if (state1.real_adc_value === state1.target_adc_value) {
           has_reset = true;
           this.real_adc_value_num = parseInt(this.initial_real_adc_value);
           this.dac_value_num = parseInt(this.initial_dac_value);
-          this.state = {dac_value:this.initial_dac_value,real_adc_value:this.initial_real_adc_value, target_adc_value:this.initial_target_adc_value};
+          this.state = {
+            dac_value: this.initial_dac_value,
+            real_adc_value: this.initial_real_adc_value,
+            target_adc_value: this.initial_target_adc_value
+          };
           console.log("...................World reset!");
 
         }
@@ -97,12 +84,16 @@
         return has_reset;
       },
 
-      state0_to_state1:function(action0){
+      state0_to_state1: function (action0) {
         this.dac_value_to_adc_value(parseInt(action0));
-        return {dac_value:this.dac_value_num.toString(),real_adc_value:this.real_adc_value_num.toString(), target_adc_value:this.initial_target_adc_value};
+        return {
+          dac_value: this.dac_value_num.toString(),
+          real_adc_value: this.real_adc_value_num.toString(),
+          target_adc_value: this.initial_target_adc_value
+        };
       },
 
-      rule:function(){
+      rule: function () {
         var state0 = this.state;
         var action0;
         var reward0;
@@ -111,48 +102,16 @@
         action0 = this.agent.forward(state0);
         state1 = this.state0_to_state1(action0);
         reward0 = this.reward(state1);
-        this.state = state1;
+        this.agent.backward(reward0, state1);
 
         console.log(state0, action0, reward0, state1);
 
+        this.state = state1;
         this.reset(state1);
 
-//        var t = this;//down up left right
-//        var state0 = t.state;
-//        var reward0;
-//        var action0;
-//        var state1;
-//        var forEachEnd = false;
-//
-//        action0 = t.agent.forward(state0);
-//
-//        for (var i= 0; i<t.allStateAndAction.length; i++) {
-////          console.log(this.allStateAndAction[0]["A"]);
-//          Object.keys(t.allStateAndAction[i]).forEach(function(state) {
-//            //console.log(t.allStateAndAction[i][state]);
-//            if (!forEachEnd && t.state === state) {
-//              Object.keys(t.allStateAndAction[i][state]).forEach(function (action) {
-//                if (!forEachEnd && action0 === action) {
-//                  forEachEnd = true;
-//                  t.state = t.allStateAndAction[i][state][action];
-//                  state1 = t.state;
-//                  reward0 = t.reward(state1);
-////                  console.log(state0, action, reward0, state1);
-//                }
-//              });
-//            }
-//          });
-//        }
-//
-////        console.log(state0, action0, reward0, state1);
-//        t.agent.backward(reward0, t.state);
-//
-//        if(t.reset()){
-////          t.agent.brain.learnRestart();
-//        }
       },
 
-      tick:function(){
+      tick: function () {
         this.clock++;
         console.log("clock = ", this.clock);
         this.rule();
@@ -161,20 +120,21 @@
       }
     };
 
-    var Agent = function(actionsDescribeAll) {
-//      var opt = {};
-//      opt.learning_steps_burnin = 100;
-//      opt.gamma = 0.1;
-//      opt.batch_experience_learn_size = 30;
-//      this.brain = new pavlov_learn.Brain(actionsDescribeAll, opt);
+    var Agent = function (actionsDescribeAll) {
+      actionsDescribeAll = ["-100", "-10", "-1", "1", "10", "100"];
+      var opt = {};
+      opt.learning_steps_burnin = 100;
+      opt.gamma = 0.1;
+      opt.batch_experience_learn_size = 30;
+      this.brain = new pavlov_learn.Brain(actionsDescribeAll, opt);
     };
     Agent.prototype = {
-      forward:function(state0){
+      forward: function (state0) {
         return "10";
-//        return this.brain.forward(state0);
+        return this.brain.forward(state0);
       },
-      backward:function(reward0, state1){
-//        this.brain.backward(reward0, state1);
+      backward: function (reward0, state1) {
+        this.brain.backward(reward0, state1);
       }
     };
 
@@ -183,13 +143,17 @@
     }
 
 
-
     var w;
     function start() {
 //      start_befor();
 
-      w = new World();
-      setInterval(tick, 100);
+//      w = new World();
+//      setInterval(tick, 1);
+      console.log("abc>bbc:", "cbc">"bbc");
+      console.log("abc=bbc:", "abc"==="abc");
+      console.log("abc<bbc:", "abc"<"bbc");
+      console.log("abc<bbc:", parseInt("abc"));
+      pavlov_learn.memory();
     }
 
   </script>
