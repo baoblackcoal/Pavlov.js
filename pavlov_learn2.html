@@ -15,6 +15,14 @@
   <!-- javascript goes here -->
   <script type="text/javascript">
 
+    var float_rand = function (a, b) {
+      return Math.random() * (b - a) + a;
+    };
+
+    var float_equal = function (a, b) {
+      return Math.abs(a - b) < 0.0000001;
+    };
+
     var world = function () {
       this.clock = 0;
       this.state_all = ["A", "B"];
@@ -114,11 +122,60 @@
         return this.finger_to_world(control_finger_num);
       },
 
-      eye_to_brain: function (state) {
-//        this.brain.
+      state_to_input_neuron:function(state){
+        var total = this.state_all.length;
+        var i = 0;
+        var error = true;
+        for(i=0;i<total;i++){
+          if (state === this.state_all[i]){
+            error = false;
+            break;
+          }
+        }
+        if (error){
+          console.log("error");
+        }
+        return 1 / total * (i + 0.5);
       },
 
-      assign_reward:function(reward){
+      eye_to_brain: function (state) {
+        var threshold = 0.5;
+        var select_weight = this.select_value_to_policy(this.brain.neuron_all[this.brain.input_enable_neuron_index].select_value);
+        console.log("select_weight", select_weight);
+        if (select_weight > threshold) {
+//          this.select_value_to_policy();
+        }
+      },
+
+      select_value_to_policy: function (select_value) {
+//        if (select_value >= 1) {
+          console.log("error weight_value=", select_value);
+//        }
+        console.log("neuron_num_total",this.brain.neuron_num_total, Math.pow(2, this.brain.neuron_num_total));
+        var select_index = Math.floor(select_value*Math.pow(2, this.brain.neuron_num_total));
+        var sum = 0;
+        var cnt = 0;
+        for (var i= 0; i<1000; i++){
+          if ((select_index&1) === 1){
+            cnt++;
+            sum += this.brain.neuron_all[i].weight_value;
+//            console.log("1", i)
+          }else{
+//            console.log("0", i, select_index)
+          }
+          select_index /= 2;
+          if (select_index < 1){
+            break;
+          }
+        }
+        var avg = sum/cnt;
+//        console.log("avg=", sum/cnt);
+//        console.log("select_index:",select_index);
+
+        return avg;
+      },
+
+      assign_reward: function (reward) {
 
       },
 
@@ -128,75 +185,139 @@
       }
     };
 
-    function tick() {
+
+      function tick()
+    {
       w.tick();
     };
 
 
     var w;
     function start() {
+      var s = [1, 2, 3, 4, 5];
+      var weight = 0.1875;
+      var t = Math.pow(2,4);
+      var a = Math.floor(t*weight);
+      console.log("a", a)
+      sum = 0;
+      var cnt = 0;
+      for (var i= 0, index=0; i<1000; i++){
+//        pow()
+        if ((a&1) === 1){
+          cnt++;
+          sum += s[i];
+          console.log("1")
+        }else{
+          console.log("0")
+        }
+        index++;
+        a /= 2;
+        if (a === 0){
+          break;
+        }
+      }
+      console.log("avg=", sum/cnt)
+
       w = new world();
-      setInterval(tick, 10);
+      setInterval(tick, 100);
     }
 
-    var brain = function (neuron_num) {
-      this.neuron_total = neuron_num;
-      var input_neuron = new neuron(1, this.neuron_total);
-      var output_neuron = new neuron(2, this.neuron_total);
-      var alive_neuron = new neuron(3, this.neuron_total);
+    var brain = function (neuron_num_total) {
+      this.neuron_num_total = neuron_num_total;
+      var index = 0;
       this.neuron_all = [];
+      var input_neuron = new neuron(1, index++, this.total);
       this.neuron_all.push(input_neuron);
+      this.input_enable_neuron_index = index;
+      var input_enable_neuron = new neuron(4, index++, this.total);
+      this.neuron_all.push(input_enable_neuron);
+      var output_neuron = new neuron(2, index++, this.total);
       this.neuron_all.push(output_neuron);
+      this.output_enable_neuron_index = index;
+      var output_enable_neuron = new neuron(5, index++, this.total);
+      this.neuron_all.push(output_enable_neuron);
+      var alive_neuron = new neuron(3, index++, this.total);
       this.neuron_all.push(alive_neuron);
-      for (var i = 0; i < this.neuron_total - 3; i++) {
-        this.neuron_all.push(new neuron(0, this.neuron_total))
+      for (; index < this.neuron_num_total; index++) {
+        this.neuron_all.push(new neuron(0, index, this.neuron_num_total))
       }
+      console.log("this.neuron_all.p", this.neuron_all.length)
     };
     brain.prototype = {
       tick: function () {
         var neuron_return = 0.4;
+
+        for (var i = 0; i < this.neuron_all.length; i++) {
+          this.neuron_all[i].forward();
+          this.neuron_all[i].world_backward();
+        }
         return neuron_return;
       }
     };
 
-    var reward_total = 1000;
+    var reward_cnt_total = 1000;
+    var reward_cnt_input = 300;
     var epsilon_min = 0.05;
-    var neuron = function (neuron_type, neuron_total) {
-      this.neuron_type = neuron_type;//0-normal neuron, 1-input neuron, 2-output neuron, 3-alive neuron
-      this.reward_cnt = 0;
-      this.weight_value = 0;
-      this.select_value = 0;
-      this.neuron_total = neuron_total;
+    var neuron = function (type, index, total) {
+      this.type = type;//0-normal neuron, 1-input neuron, 2-output neuron, 3-alive neuron, 4-input enable neuron, 5-output enable neuron
+      this.total = total;
+      this.index = index;
+      if (this.type === 3) {
+        this.reward_cnt = reward_cnt_total;
+      } else {
+        this.reward_cnt = float_rand(0, 1) * reward_cnt_total;
+      }
+      this.weight_value = float_rand(0, 1);
+      this.select_value = float_rand(0, 1);
     };
     neuron.prototype = {
+      get_name: function () {
+        var name_str = ["normal", "input", "output", "alive", "input enable", "output enable"];
+        if (this.type < 6) {
+          return name_str[this.type];
+        } else {
+          console.log("error");
+          return "error";
+        }
+      },
       forward: function () {
-        if (this.reward_cnt == 0) {
-          return;
+        if (this.reward_cnt == 0 && this.type === 3) {
+          return -1;
         } else if (this.reward_cnt > 0) {
           this.reward_cnt--;
         }
-        var epsilon = Math.min(1.0, Math.max(epsilon_min, 1.0 - (reward_total - this.reward_cnt) / reward_total));
-        if (global.randf(0, 1) > epsilon) {
-          this.select_value = global.randf(0, 1);
+        var epsilon = Math.min(1.0, Math.max(epsilon_min, 1.0 - (reward_cnt_total - this.reward_cnt) / reward_cnt_total));
+        if (float_rand(0, 1) > epsilon) {
+          this.select_value = float_rand(0, 1);
         }
-        return this.select_value * this.neuron_total;
+        return this.select_value * this.total;
       },
 
       other_neuron_backward: function (from_alive_neuron) {
-        if ((from_alive_neuron && this.reward_cnt == 0 && this.neuron_type === 1 || this.neuron_type === 2)
+        if ((from_alive_neuron && this.reward_cnt == 0 && this.type === 1 || this.type === 2)
           || !from_alive_neuron) {
           this.reward_cnt += 100;
-          if (this.reward_cnt > reward_total) this.reward_cnt = reward_total;
+          if (this.reward_cnt > reward_cnt_total) this.reward_cnt = reward_cnt_total;
+        }
+      },
+
+      get_weight_value: function (reward) {
+        if (this.type === 3) {
+          return float_rand(0, 1);
+        } else {
+          return this.weight_value;
         }
       },
 
       world_backward: function (reward) {
-        if (this.neuron_type == 2) {
+        if (this.type === 2) {
           this.reward_cnt += Math.floor(reward * 100);
+        } else {
+//          console.log("error");
         }
 
-        if (this.reward_cnt > reward_total) {
-          this.reward_cnt = reward_total;
+        if (this.reward_cnt > reward_cnt_total) {
+          this.reward_cnt = reward_cnt_total;
         } else if (this.reward_cnt < 0) {
           this.reward_cnt = 0;
         }
