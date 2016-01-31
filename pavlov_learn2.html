@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<head>
+  <title>minimal demo</title>
+
+  <!-- CSS goes here -->
+  <style>
+    body {
+      background-color: #FFF; /* example... */
+    }
+  </style>
+
+  <!-- import convnetjs library -->
+  <script src="pavlov_learn.js"></script>
+
+  <!-- javascript goes here -->
+  <script type="text/javascript">
+
+    var World = function () {
+      this.clock = 0;
+      this.state_all = ["A", "B"];
+      this.agent_action_all = ["0", "1", "2"];
+      this.agent_action = this.agent_action_all[0];
+      this.agent = new Agent();
+      this.reward = 0;
+      this.state = this.state_all[0];
+    };
+    World.prototype = {
+      reward_to_agent: function () {
+        this.reward = 0;
+
+        if (this.clock % 100 <= 50) {
+          this.state = this.state_all[0];
+          if (this.agent_action === this.agent_action_all[1]) {
+            this.reward = 1;
+          }
+        } else {
+          this.state = this.state_all[1];
+          if (this.agent_action === this.agent_action_all[2]) {
+            this.reward = 1;
+          }
+        }
+      },
+
+      action_to_state: function (action_num) {
+        this.agent_action = this.agent_action_all[action_num];
+      },
+
+
+      rule: function () {
+        if (this.clock % 20 == 0) {
+          console.log("world and agent action:", this.reward, this.state, this.agent_action);
+        }
+        var action_num = this.agent.tick(this.reward, this.state);
+        this.action_to_state(action_num);
+        this.reward_to_agent();
+
+
+//        var t = this;//down up left right
+//        var state0 = t.state;
+//        var reward0;
+//        var action0;
+//        var state1;
+//        var forEachEnd = false;
+//
+//        action0 = t.agent.forward(state0);
+//
+//        for (var i = 0; i < t.allStateAndAction.length; i++) {
+////          console.log(this.allStateAndAction[0]["A"]);
+//          Object.keys(t.allStateAndAction[i]).forEach(function (state) {
+//            //console.log(t.allStateAndAction[i][state]);
+//            if (!forEachEnd && t.state === state) {
+//              Object.keys(t.allStateAndAction[i][state]).forEach(function (action) {
+//                if (!forEachEnd && action0 === action) {
+//                  forEachEnd = true;
+//                  t.state = t.allStateAndAction[i][state][action];
+//                  state1 = t.state;
+//                  reward0 = t.reward(state1);
+////                  console.log(state0, action, reward0, state1);
+//                }
+//              });
+//            }
+//          });
+//        }
+//
+////        console.log(state0, action0, reward0, state1);
+//        t.agent.backward(reward0, t.state);
+//
+//        if (t.reset()) {
+////          t.agent.brain.learnRestart();
+//        }
+      }
+      ,
+
+      tick: function () {
+        this.clock++;
+//        console.log("clock = ", this.clock);
+//        if(this.clock < 100)
+        this.rule();
+      }
+    };
+
+    var Agent = function (actionsDescribeAll) {
+//      var opt = {};
+//      opt.learning_steps_burnin = 100;
+//      opt.gamma = 0.1;
+//      opt.batch_experience_learn_size = 30;
+//      this.brain = new pavlov_learn.Brain(actionsDescribeAll, opt);
+      this.brain = new brain(10);
+    };
+    Agent.prototype = {
+      tick: function (state) {
+        this.eye_to_brain(state);
+        var control_finger_num = this.brain.tick();
+        return this.finger_to_world(control_finger_num);
+      },
+
+      eye_to_brain: function (state) {
+//        this.brain.
+      },
+
+      finger_to_world: function () {
+        return 1;
+      }
+    };
+
+    function tick() {
+      w.tick();
+    };
+
+
+    var w;
+    function start() {
+      w = new World();
+      setInterval(tick, 10);
+    }
+
+    var brain = function (neuron_num) {
+      this.neuron_total = neuron_num;
+      var input_neuron = new neuron(1, this.neuron_total);
+      var output_neuron = new neuron(2, this.neuron_total);
+      var alive_neuron = new neuron(3, this.neuron_total);
+      this.neuron_all = [];
+      this.neuron_all.push(input_neuron);
+      this.neuron_all.push(output_neuron);
+      this.neuron_all.push(alive_neuron);
+      for (var i = 0; i < this.neuron_total - 3; i++) {
+        this.neuron_all.push(new neuron(0, this.neuron_total))
+      }
+    };
+    brain.prototype = {
+      tick: function () {
+
+      }
+    };
+
+    var reward_total = 1000;
+    var epsilon_min = 0.05;
+    var neuron = function (neuron_type, neuron_total) {
+      this.neuron_type = neuron_type;//0-normal neuron, 1-input neuron, 2-output neuron, 3-alive neuron
+      this.reward_cnt = 0;
+      this.weight_value = 0;
+      this.select_value = 0;
+      this.neuron_total = neuron_total;
+    };
+    neuron.prototype = {
+      forward: function () {
+        if (this.reward_cnt == 0) {
+          return;
+        } else if (this.reward_cnt > 0) {
+          this.reward_cnt--;
+        }
+        var epsilon = Math.min(1.0, Math.max(epsilon_min, 1.0 - (reward_total - this.reward_cnt) / reward_total));
+        if (global.randf(0, 1) > epsilon) {
+          this.select_value = global.randf(0, 1);
+        }
+        return this.select_value * this.neuron_total;
+      },
+
+      other_neuron_backward: function (from_alive_neuron) {
+        if ((from_alive_neuron && this.reward_cnt == 0 && this.neuron_type === 1 || this.neuron_type === 2)
+          || !from_alive_neuron) {
+          this.reward_cnt += 100;
+          if (this.reward_cnt > reward_total) this.reward_cnt = reward_total;
+        }
+      },
+
+      world_backward: function (reward) {
+        if (this.neuron_type == 2) {
+          this.reward_cnt += Math.floor(reward * 100);
+        }
+
+        if (this.reward_cnt > reward_total) {
+          this.reward_cnt = reward_total;
+        } else if (this.reward_cnt < 0) {
+          this.reward_cnt = 0;
+        }
+      }
+    }
+
+  </script>
+</head>
+
+<body onload="start()">
+<div id="egdiv"></div>
+</body>
+</html>
