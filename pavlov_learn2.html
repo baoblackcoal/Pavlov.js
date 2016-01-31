@@ -15,16 +15,16 @@
   <!-- javascript goes here -->
   <script type="text/javascript">
 
-    var World = function () {
+    var world = function () {
       this.clock = 0;
       this.state_all = ["A", "B"];
       this.agent_action_all = ["0", "1", "2"];
       this.agent_action = this.agent_action_all[0];
-      this.agent = new Agent();
+      this.agent = new agent(this.state_all, this.agent_action_all);
       this.reward = 0;
       this.state = this.state_all[0];
     };
-    World.prototype = {
+    world.prototype = {
       reward_to_agent: function () {
         this.reward = 0;
 
@@ -41,8 +41,8 @@
         }
       },
 
-      action_to_state: function (action_num) {
-        this.agent_action = this.agent_action_all[action_num];
+      action_to_state: function (agent_action) {
+        this.agent_action = agent_action;
       },
 
 
@@ -50,8 +50,8 @@
         if (this.clock % 20 == 0) {
           console.log("world and agent action:", this.reward, this.state, this.agent_action);
         }
-        var action_num = this.agent.tick(this.reward, this.state);
-        this.action_to_state(action_num);
+        var agent_action = this.agent.tick(this.reward, this.state);
+        this.action_to_state(agent_action);
         this.reward_to_agent();
 
 
@@ -99,17 +99,17 @@
       }
     };
 
-    var Agent = function (actionsDescribeAll) {
-//      var opt = {};
-//      opt.learning_steps_burnin = 100;
-//      opt.gamma = 0.1;
-//      opt.batch_experience_learn_size = 30;
-//      this.brain = new pavlov_learn.Brain(actionsDescribeAll, opt);
-      this.brain = new brain(10);
+    var agent = function (state_all, agent_action_all) {
+      this.state_all = state_all;
+      this.agent_action_all = agent_action_all;
+      var input_neuron_num = 1;
+      var output_neuron_num = 1;
+      this.brain = new brain(10, input_neuron_num, output_neuron_num);
     };
-    Agent.prototype = {
-      tick: function (state) {
+    agent.prototype = {
+      tick: function (reward, state) {
         this.eye_to_brain(state);
+        this.assign_reward(reward);
         var control_finger_num = this.brain.tick();
         return this.finger_to_world(control_finger_num);
       },
@@ -118,8 +118,13 @@
 //        this.brain.
       },
 
-      finger_to_world: function () {
-        return 1;
+      assign_reward:function(reward){
+
+      },
+
+      finger_to_world: function (control_finger_num) {
+        var agent_action = this.agent_action_all[Math.floor(control_finger_num * this.agent_action_all.length)];
+        return agent_action;
       }
     };
 
@@ -130,7 +135,7 @@
 
     var w;
     function start() {
-      w = new World();
+      w = new world();
       setInterval(tick, 10);
     }
 
@@ -149,7 +154,8 @@
     };
     brain.prototype = {
       tick: function () {
-
+        var neuron_return = 0.4;
+        return neuron_return;
       }
     };
 
