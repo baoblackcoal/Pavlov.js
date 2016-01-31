@@ -13,95 +13,27 @@ var temporal = 2;
     this.state1 = state1;
   };
 
-  var single_memory_state = function (state_name, state) {
+  var single_memory = function (state_name, state) {
     //first, min, max, 4 middle of min to max, past 4 from now, other past 4 state value and now state, past 4 state new, past 4 reward new
     this.first = state[state_name];
-    console.log("first=", this.first);
     this.min = state[state_name];
     this.max = state[state_name];
     this.misc = {middle: [], past: [], state_new: [], reward_new: [], other_state: {}};
     for (var i = 0; i < temporal; i++) {
       this.misc.middle[i] = state[state_name];
       this.misc.past[i] = state[state_name];
-      this.misc.state_new[i] = state[state_name];
-      this.misc.reward_new[i] = state[state_name];
+      this.misc.state_new[i] = "0";
+      this.misc.reward_new[i] = "0";
     }
     var t = this;
     Object.keys(state).forEach(function (state_name_) {
       if (state_name_ !== state_name) {
-        t.misc.other_state[state_name_] = t.misc.other_state[state_name_] || [];
-        for (var i = 0; i < temporal + 1; i++) {
-          t.misc.other_state[state_name_].push(state[state_name_]);
-        }
+        t.misc.other_state[state_name_] = state[state_name_];
       }
     });
   };
 
-  var compare_state = function (state_value, now_state_value) {
-    //console.log("compare:", state_value, now_state_value);
-    if (now_state_value === state_value) {
-      return "=";
-    } else if (now_state_value > state_value) {
-      return ">";
-    } else if (now_state_value < state_value) {
-      return "<";
-    }
-    return "error!";
-  };
-
-  var memory = function (state) {
-    var memory_all = {};
-    state = {adc: 1, dac: 2};
-    var state_now = {adc: 3, dac: 2};
-    var now_value;
-
-    Object.keys(state).forEach(function (state_name) {
-      memory_all[state_name] = memory_all[state_name] || new single_memory_state(state_name, state);
-    });
-    //console.log(memory_all);
-
-    console.log("m first:", memory_all["adc"]["first"]);
-    var state_experience = {};
-    var i;
-    var key;
-    Object.keys(memory_all).forEach(function (state_name) {
-      //console.log(state_name, ":");
-      now_value = state_now[state_name];
-      //console.log("now_value:", now_value);
-
-      Object.keys(memory_all[state_name]).forEach(function (name) {
-        if (name === "misc") {
-          Object.keys(memory_all[state_name][name]).forEach(function (misc_name) {
-            if (misc_name === "other_state") {
-              Object.keys(memory_all[state_name][name][misc_name]).forEach(function (state_name_) {
-                for (i = 0; i < temporal + 1; i++) {
-                  key = state_name + "_" + name + "_" + misc_name + "_" + state_name_ + "_" + i;
-                  state_experience[key] = compare_state(memory_all[state_name][name][misc_name][state_name_][i], now_value);
-                  //console.log("misc other:", k, compare_state(memory_all[state_name][name][misc_name][state_name_][i], now_value));
-                }
-              });
-            } else {
-              for (i = 0; i < temporal; i++) {
-                key = state_name + "_" + name + "_" + misc_name + "_" + i;
-                state_experience[key] = compare_state(memory_all[state_name][name][misc_name][i], now_value);
-                console.log(key, compare_state(memory_all[state_name][name][misc_name][i], now_value));
-              }
-            }
-          });
-        }
-        else {
-          console.log(state_name + "_" + name, compare_state(memory_all[state_name][name], now_value));
-          key = state_name + "_" + name;
-          state_experience[key] = compare_state(memory_all[state_name][name], now_value);
-        }
-      });
-    });
-
-    console.log("state_experience:", state_experience);
-  };
-
-
-  var floatIs0 = function (value) {
+  var float_is_0 = function (value) {
     return Math.abs(value) < 0.0000001;
   };
 
@@ -112,6 +44,139 @@ var temporal = 2;
   var randf = function (a, b) {
     return Math.random() * (b - a) + a;
   };
+  var compare_self_state_value = function (state_value, now_state_value) {
+    if (now_state_value === state_value) {
+      return "=";
+    } else if (now_state_value > state_value) {
+      return ">";
+    } else if (now_state_value < state_value) {
+      return "<";
+    }
+    console.log("error compare:", typeof state_value, typeof now_state_value);
+
+    return "error!";
+  };
+  var compare_other_state_value = function (now_state_value, before_state_value, other_state_value) {
+    if (now_state_value === other_state_value) {
+      return "=";
+    } else if (Math.abs(now_state_value - other_state_value) > Math.abs(before_state_value - other_state_value)) {
+      return "(";
+    } else if (Math.abs(now_state_value - other_state_value) < Math.abs(before_state_value - other_state_value)) {
+      return ")";
+    } else if (Math.abs(now_state_value - other_state_value) === Math.abs(before_state_value - other_state_value)) {
+      return "|";
+    }
+    console.log("error compare_other_state_value:", Math.abs(now_state_value - other_state_value), Math.abs(before_state_value - other_state_value));
+
+    return "error!";
+  };
+
+  var memory = function () {
+    this.memory_all = {};
+  };
+  memory.prototype = {
+    initial: function (state) {
+      var t = this;
+      Object.keys(state).forEach(function (state_name) {
+        t.memory_all[state_name] = t.memory_all[state_name] || new single_memory(state_name, state);
+      });
+      console.log("memory_all", t.memory_all);
+      return this.state_to_memory_state(state, true);
+    },
+
+    single_assign: function (state_name, state) {
+      //first, min, max, 4 middle of min to max, past 4 from now, other past 4 state value and now state, past 4 state new, past 4 reward new
+      var t = this;
+      //this.first = state[state_name];
+      var now_value = state[state_name];
+      //if (t.memory_all[state_name].min > now_value) t.memory_all[state_name].min = now_value;
+      //if (t.memory_all[state_name].max < now_value) t.memory_all[state_name].max = now_value;
+      t.memory_all[state_name].min = "0";
+      t.memory_all[state_name].max = "0";
+      //this.misc = {middle: [], past: [], state_new: [], reward_new: [], other_state: {}};
+      t.memory_all[state_name].misc.past.push(now_value);
+      if (t.memory_all[state_name].misc.past.length > temporal) t.memory_all[state_name].misc.past.shift();
+      t.memory_all[state_name].misc.state_new.push("0");
+      if (t.memory_all[state_name].misc.state_new.length > temporal) t.memory_all[state_name].misc.state_new.shift();
+      t.memory_all[state_name].misc.reward_new.push("0");
+      if (t.memory_all[state_name].misc.reward_new.length > temporal) t.memory_all[state_name].misc.reward_new.shift();
+      for (var i = 0; i < temporal; i++) {
+        //t.memory_all[state_name].misc.middle[i] = ((t.memory_all[state_name].max - t.memory_all[state_name].min) / (temporal + 1) * (i + 1)).toString();
+        //t.memory_all[state_name].misc.middle[i] = (Math.floor(t.memory_all[state_name].misc.middle[i])).toString();
+        t.memory_all[state_name].misc.middle[i] = "0"
+      }
+      Object.keys(state).forEach(function (state_name_) {
+        if (state_name_ !== state_name) {
+          t.memory_all[state_name].misc.other_state[state_name_] = state[state_name_];
+          //if(t.memory_all[state_name].misc.other_state[state_name_].length > temporal+1) t.memory_all[state_name].misc.other_state[state_name_].shift();
+          //t.misc.other_state[state_name_] = t.misc.other_state[state_name_] || [];
+          //for (var i = 0; i < temporal + 1; i++) {
+          //  t.misc.other_state[state_name_].push(state[state_name_]);
+          //}
+        }
+      });
+    },
+
+    state_to_memory_state: function (state, init) {
+      //state = {adc: 1, dac: 2};
+      var t = this;
+      //var state_now = {adc: 3, dac: 2};
+      var now_value;
+
+      //Object.keys(state).forEach(function (state_name) {
+      //  memory_all[state_name] = memory_all[state_name] || new single_memory_state(state_name, state);
+      //});
+      //console.log(memory_all);
+
+      var memory_state = {};
+      var i;
+      var key;
+      Object.keys(t.memory_all).forEach(function (state_name) {
+        //console.log(state_name, ":");
+        if (!init) t.single_assign(state_name, state);
+        now_value = state[state_name];
+
+        //console.log("now_value:", now_value);
+
+        Object.keys(t.memory_all[state_name]).forEach(function (name) {
+          if (name === "misc") {
+            Object.keys(t.memory_all[state_name][name]).forEach(function (misc_name) {
+              if (misc_name === "other_state") {
+                Object.keys(t.memory_all[state_name][name][misc_name]).forEach(function (state_name_) {
+                  key = state_name + "_" + name + "_" + misc_name + "_" + state_name_;
+                  if (state_name === "real_adc_value" && state_name_ === "target_adc_value") {
+                    memory_state[key] = compare_other_state_value(t.memory_all[state_name][name]["past"][temporal - 1], t.memory_all[state_name][name]["past"][temporal - 2], t.memory_all[state_name][name][misc_name][state_name_]);
+                  } else {
+                    memory_state[key] = "=";
+                  }
+
+                  //console.log(key, compare_other_state_value(t.memory_all[state_name][name]["past"][temporal-1], t.memory_all[state_name][name]["past"][temporal-2], t.memory_all[state_name][name][misc_name][state_name_]));
+                });
+              } else {
+                for (i = 0; i < temporal; i++) {
+                  key = state_name + "_" + name + "_" + misc_name + "_" + i;
+                  //memory_state[key] = compare_self_state_value(t.memory_all[state_name][name][misc_name][i], now_value);
+                  memory_state[key] = "=";
+                  //console.log(key, t.memory_all[state_name][name][misc_name][i], now_value, compare_self_state_value(t.memory_all[state_name][name][misc_name][i], now_value));
+                }
+              }
+            });
+          }
+          else {
+            key = state_name + "_" + name;
+            //memory_state[key] = compare_self_state_value(t.memory_all[state_name][name], now_value);
+            memory_state[key] = "=";
+            //console.log(key,t.memory_all[state_name][name], now_value, compare_self_state_value(t.memory_all[state_name][name], now_value));
+          }
+        });
+      });
+      //console.log("===================");
+      //console.log(memory_state);
+
+      return memory_state;
+    }
+  };
+
 
   var Brain = function (actionsDescribeAll, opt) {
     opt = opt || {};
@@ -139,6 +204,7 @@ var temporal = 2;
     this.policyActionCnt = 0;
     experienceR = {};
     experienceP = {};
+    this.memory = new memory();
   };
   Brain.prototype = {
     experienceReset: function () {
@@ -176,10 +242,15 @@ var temporal = 2;
       this.epsilon = Math.min(1.0, Math.max(this.epsilon_min, 1.0 - (this.age - this.learning_steps_burnin) / this.age));
 
       if (this.forwardCnt > 1) {
+        state0 = this.memory.state_to_memory_state(state0, false);
         if (global.randf(0, 1) > this.epsilon) {
           policyExecuted = this.policyExecute(state0);
         }
+      } else {
+        console.log("initial");
+        state0 = this.memory.initial(state0);
       }
+      this.state0 = state0;
 
       if (!policyExecuted || this.action0 === NoAction) {
         //console.log("randi action!");
@@ -196,14 +267,14 @@ var temporal = 2;
 
     backward: function (reward0, state1) {
       this.reward0 = reward0;
-      this.state1 = state1;
+      this.state1 = this.memory.state_to_memory_state(state1, false);
       this.age++;
 
-      if (floatIs0(this.reward0)) this.reward0 = -0.1;
+      if (float_is_0(this.reward0)) this.reward0 = -0.1;
       var e = new Experience(this.state0, this.action0, this.reward0, this.state1);
       //console.log(e);
       this.batchExperience.push(e);
-      if (this.batchExperience.length > this.batch_experience_learn_size) {
+      if (this.batchExperience.length >= this.batch_experience_learn_size) {
         this.policyLearn(this.batchExperience);
         this.batchExperience = [];
       }
@@ -217,16 +288,16 @@ var temporal = 2;
         state1Replace = step.state1;
 
         if (typeof step.state0 === "object") {
-          state0Replace = "{ ";
-          state1Replace = "{ ";
+          state0Replace = "[";
+          state1Replace = "[";
           Object.keys(step.state0).forEach(function (i) {
             state0Replace += step.state0[i];
-            state0Replace += " ";
+            //state0Replace += " ";
             state1Replace += step.state1[i];
-            state1Replace += " ";
+            //state1Replace += " ";
           });
-          state0Replace += "}";
-          state1Replace += "}";
+          state0Replace += "]";
+          state1Replace += "]";
 //		console.log("state0Replace:",state0Replace);
 //		console.log("state1Replace:",state1Replace);
         }
@@ -303,7 +374,7 @@ var temporal = 2;
       });
 //  console.log("totalDif:",totalDif,"totalOld:",0.001*totalOld);
 
-      if (floatIs0(totalDif) && floatIs0(totalOld)) {
+      if (float_is_0(totalDif) && float_is_0(totalOld)) {
         return true;
       } else {
         return (totalDif < 0.001 * totalOld)

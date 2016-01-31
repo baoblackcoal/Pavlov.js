@@ -20,7 +20,7 @@
       this.clock = 0;
       this.initial_real_adc_value = "1";
       this.initial_target_adc_value = "151";
-      this.initial_dac_value = "1";
+      this.initial_dac_value = "500";
       this.state = {
         dac_value: this.initial_dac_value,
         real_adc_value: this.initial_real_adc_value,
@@ -59,7 +59,7 @@
         var ret = 0;
 
         if (state1.real_adc_value === state1.target_adc_value) {
-              ret = 1;
+          ret = 1;
         }
 
         return ret;
@@ -104,7 +104,9 @@
         reward0 = this.reward(state1);
         this.agent.backward(reward0, state1);
 
-        console.log(state0, action0, reward0, state1);
+//        if (this.clock % 300 === 0) {
+          console.log(state0, action0, reward0, state1);
+//        }
 
         this.state = state1;
         this.reset(state1);
@@ -113,24 +115,29 @@
 
       tick: function () {
         this.clock++;
-        console.log("clock = ", this.clock);
+//        console.log("clock = ", this.clock);
         this.rule();
-//        if(this.clock < 100)
-//        this.rule();
+//        if (this.clock < 3) {
+//          this.rule();
+//        }
       }
     };
 
     var Agent = function (actionsDescribeAll) {
-      actionsDescribeAll = ["-100", "-10", "-1", "1", "10", "100"];
+      actionsDescribeAll = ["-10", "-1", "1", "10"];
       var opt = {};
       opt.learning_steps_burnin = 100;
       opt.gamma = 0.1;
-      opt.batch_experience_learn_size = 30;
+      opt.batch_experience_learn_size = 0;
       this.brain = new pavlov_learn.Brain(actionsDescribeAll, opt);
     };
     Agent.prototype = {
+//      set_task:function(state0, actionreward){
+//
+//      }
+
       forward: function (state0) {
-        return "10";
+//        return "10";
         return this.brain.forward(state0);
       },
       backward: function (reward0, state1) {
@@ -147,13 +154,32 @@
     function start() {
 //      start_befor();
 
-//      w = new World();
-//      setInterval(tick, 1);
-      console.log("abc>bbc:", "cbc">"bbc");
-      console.log("abc=bbc:", "abc"==="abc");
-      console.log("abc<bbc:", "abc"<"bbc");
-      console.log("abc<bbc:", parseInt("abc"));
-      pavlov_learn.memory();
+      w = new World();
+      setInterval(tick, 100);
+
+//      var a = [];
+//      a.push(1);
+//      a.push(2);
+//      a.push(3);
+//      a.shift();
+//      a.push(4);
+//      a.shift();
+//      console.log("a", a, a[0], a[1]);
+
+
+//      console.log("abc>bbc:", "cbc">"bbc");
+//      console.log("abc=bbc:", "abc"==="abc");
+//      console.log("abc<bbc:", "abc"<"bbc");
+//      console.log("abc<bbc:", parseInt("abc"));
+//      pavlov_learn.memory();
+//      var opt = {};
+//      opt.batch_experience_learn_size = 30;
+//
+//      var actionsDescribeAll = ["-100", "-10", "-1", "1", "10", "100"];
+//      var brain = new pavlov_learn.Brain(actionsDescribeAll, opt);
+//      brain.forward({adc: 1, dac: 2});
+//      brain.backward(0, {adc: 1, dac: 3});
+
     }
 
   </script>
