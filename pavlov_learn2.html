@@ -86,12 +86,12 @@
         this.eye_to_brain(state);
         this.control_finger_value = this.brain.tick();
         return this.finger_to_world(this.control_finger_value);
-    },
+      },
 
-      state_to_input_neuron: function (state) {
+      state_to_input_neuron_value: function (state) {
         var total = this.state_all.length;
-        var i = 0;
         var error = true;
+        var i;
         for (i = 0; i < total; i++) {
           if (state === this.state_all[i]) {
             error = false;
@@ -105,18 +105,18 @@
       },
 
       eye_to_brain: function (state) {
-        var value = this.state_to_input_neuron(state);
+        var value = this.state_to_input_neuron_value(state);
         this.brain.activate_neuron(1, value);
-      },
-
-      assign_reward: function (reward) {
-        this.brain.activate_neuron(2, this.control_finger_value);
-        console.log("this.output_neuron_action_index:", this.brain.output_neuron_action_index);
-        this.brain.neuron_all[this.brain.output_neuron_action_index].world_backward(reward);
       },
 
       finger_to_world: function (control_finger_value) {
         return this.agent_action_all[Math.floor(control_finger_value * this.agent_action_all.length)];
+      },
+
+      assign_reward: function (reward) {
+//        this.brain.activate_neuron(2, this.control_finger_value);
+//        console.log("this.output_neuron_action_index:", this.brain.output_neuron_action_index);
+        this.brain.neuron_all[this.brain.output_neuron_action_index].world_backward(reward);
       }
     };
 
@@ -233,9 +233,9 @@
           }
 //        }
 
-        console.log("has_idx", has_idx);
+        console.log("has_value:", has_value, "has_idx:", has_idx);
         console.log("reward_cnt_least_idx", reward_cnt_least_idx);
-        if (has_idx){
+        if (has_value){
           this.neuron_all[has_idx].world_backward(1);
         } else {
           if (this.neuron_all[reward_cnt_least_idx].reward_cnt < reward_cnt_input) {
