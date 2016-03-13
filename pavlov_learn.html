@@ -5,7 +5,7 @@
   <!-- CSS goes here -->
   <style>
     body {
-        background-color: #FFF; /* example... */
+      background-color: #FFF; /* example... */
     }
   </style>
 
@@ -15,14 +15,14 @@
   <!-- javascript goes here -->
   <script type="text/javascript">
 
-    var World = function(){
+    var World = function () {
       this.clock = 0;
       this.stateAll = ["A", "B", "C", "D", "Prize"];//Prize = 1 -> reward = 1 else reward = 0
-      this.stateA = {"A":{D:"C", U:"A", L:"Prize", R:"B"}};
-      this.stateB = {"B":{D:"D", U:"B", L:"A", R:"B"}};
-      this.stateC = {"C":{D:"C", U:"A", L:"C", R:"D"}};
-      this.stateD = {"D":{D:"D", U:"B", L:"C", R:"D"}};
-      this.statePrize = {Prize:{"D":"Prize", U:"Prize", L:"Prize", R:"A"}};
+      this.stateA = {"A": {D: "C", U: "A", L: "Prize", R: "B"}};
+      this.stateB = {"B": {D: "D", U: "B", L: "A", R: "B"}};
+      this.stateC = {"C": {D: "C", U: "A", L: "C", R: "D"}};
+      this.stateD = {"D": {D: "D", U: "B", L: "C", R: "D"}};
+      this.statePrize = {Prize: {"D": "Prize", U: "Prize", L: "Prize", R: "A"}};
       this.allStateAndAction = [];
       this.allStateAndAction.push(this.stateA);
       this.allStateAndAction.push(this.stateB);
@@ -39,17 +39,17 @@
       this.agent = new Agent(this.actionsDescribeAll);
     };
     World.prototype = {
-      reward:function(state){
+      reward: function (state) {
         var ret = 0;
 
-        if(state === "Prize") {
+        if (state === "Prize") {
           ret = 1;
         }
 
         return ret;
       },
       //reset state when state == "Prize"
-      reset:function(){
+      reset: function () {
         var stateI;
         var hasReset = false;
 
@@ -65,7 +65,7 @@
         return hasReset;
       },
 
-      rule:function(){
+      rule: function () {
         var t = this;//down up left right
         var state0 = t.state;
         var reward0;
@@ -75,9 +75,9 @@
 
         action0 = t.agent.forward(state0);
 
-        for (var i= 0; i<t.allStateAndAction.length; i++) {
+        for (var i = 0; i < t.allStateAndAction.length; i++) {
 //          console.log(this.allStateAndAction[0]["A"]);
-          Object.keys(t.allStateAndAction[i]).forEach(function(state) {
+          Object.keys(t.allStateAndAction[i]).forEach(function (state) {
             //console.log(t.allStateAndAction[i][state]);
             if (!forEachEnd && t.state === state) {
               Object.keys(t.allStateAndAction[i][state]).forEach(function (action) {
@@ -96,12 +96,12 @@
 //        console.log(state0, action0, reward0, state1);
         t.agent.backward(reward0, t.state);
 
-        if(t.reset()){
+        if (t.reset()) {
 //          t.agent.brain.learnRestart();
         }
       },
 
-      tick:function(){
+      tick: function () {
         this.clock++;
 //        console.log("clock = ", this.clock);
 //        if(this.clock < 100)
@@ -109,7 +109,7 @@
       }
     };
 
-    var Agent = function(actionsDescribeAll) {
+    var Agent = function (actionsDescribeAll) {
       var opt = {};
       opt.learning_steps_burnin = 100;
       opt.gamma = 0.1;
@@ -117,11 +117,11 @@
       this.brain = new pavlov_learn.Brain(actionsDescribeAll, opt);
     };
     Agent.prototype = {
-      forward:function(state){
+      forward: function (state) {
         return this.brain.forward(state);
 //        return pavlov_learn.randi(0, this.actionsNum);
       },
-      backward:function(reward0, state1){
+      backward: function (reward0, state1) {
         this.brain.backward(reward0, state1);
 //        console.log("age =", this.age);
       }
@@ -131,75 +131,9 @@
       w.tick();
     }
 
-
-
-    function start_befor() {
-      var e1 = new pavlov_learn.Experience("B", "L", 0, "A");
-      var e2 = new pavlov_learn.Experience("A", "L", 1, "Prize");
-      var e3 = new pavlov_learn.Experience("B", "B", -1, "D");
-      var e4 = new pavlov_learn.Experience("D", "F", 0, "B");
-//var e5 = new pavlov_learn.Experience("Prize", "L", 0, "A");
-//var e6 = new pavlov_learn.Experience("D", "L", 1, "Prize");
-      var e7 = new pavlov_learn.Experience("D", "L", 0, "C");
-      var e8 = new pavlov_learn.Experience("C", "F", 0, "A");
-      var e9 = new pavlov_learn.Experience("C", "R", 0, "D");
-      var e10 = new pavlov_learn.Experience("A", "R", 0, "B");
-
-      var e5 = new pavlov_learn.Experience("B", "F", 0, "B");
-
-      var brain = new pavlov_learn.Brain();
-      brain.experienceReset();
-      var e = [];
-      e.push(e1);
-//      console.log("e:",e);
-//      console.log(brain.policyLearn(e));
-//      var e = [];
-      e.push(e2);
-//      console.log(brain.policyLearn(e));
-//      var e = [];
-      e.push(e3);
-//      e.push(e4);
-      console.log(brain.policyLearn(e));
-//
-//      var e = [];
-//      e.push(e4);
-//      console.log(brain.policyLearn(e));
-//
-//      var e = [];
-//      e.push(e5);
-//      console.log(brain.policyLearn(e));
-////e.push(e5);
-////e.push(e6);
-//      var e = [];
-//      e.push(e1);
-//      console.log(brain.policyLearn(e));
-//      var e = [];
-//      e.push(e2);
-//      console.log(brain.policyLearn(e));
-//      var e = [];
-//      e.push(e3);
-//      console.log(brain.policyLearn(e));
-//      var e = [];
-//      e.push(e4);
-//      console.log(brain.policyLearn(e));
-//      var e = [];
-//      e.push(e7);
-//      console.log(brain.policyLearn(e));
-//      var e = [];
-//      e.push(e8);
-//      console.log(brain.policyLearn(e));
-//      var e = [];
-//      e.push(e9);
-//      console.log(brain.policyLearn(e));
-//      var e = [];
-//      e.push(e10);
-//      console.log(brain.policyLearn(e));
-    }
-
     var w;
     function start() {
 //      start_befor();
-
       w = new World();
       setInterval(tick, 10);
     }

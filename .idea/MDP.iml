@@ -3,7 +3,14 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$" />
     <content url="file://$MODULE_DIR$/../convnetjs/convnetjs" />
+    <content url="file://$MODULE_DIR$/../../Work/pet_feeder/express_mysql" />
+    <content url="file://$MODULE_DIR$/../../Work/pet_feeder/mqtt_mosca.js" />
+    <content url="file://$MODULE_DIR$/../../Work/pet_feeder/server/docker/alinode/server_app/owoniot" />
+    <content url="file://$MODULE_DIR$/../../Work/pet_feeder/server/docker/alinode/server_app/server_app_src" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="express_mysql node_modules" level="project" />
+    <orderEntry type="library" name="owoniot node_modules" level="project" />
+    <orderEntry type="library" name="server_app_src node_modules" level="project" />
   </component>
 </module>
