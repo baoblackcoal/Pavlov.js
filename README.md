@@ -3,7 +3,7 @@ PavlovLearn.js is inspired by [Pavlov.js](https://github.com/NathanEpstein/Pavlo
 On the basis of the Pavlov.js added some features like below:
 
 * support nodejs and browser
-* learn fast through adding r parameter that 
+* learn fast through adding r parameter
 * support 2D data
 * batch learn
 * learn from experience
