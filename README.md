@@ -1,3 +1,20 @@
+# PavlovLearn.js
+PavlovLearn.js is inspired by [Pavlov.js](https://github.com/NathanEpstein/Pavlov.js) and [convnetjs](https://github.com/karpathy/convnetjs)
+On the basis of the Pavlov.js added some features like below:
+
+* support nodejs and browser
+* learn fast through adding r parameter that 
+* support 2D data
+* batch learn
+* learn from experience
+* fix learning error by zero reward 
+
+## Example
+using Pavlov.js example2 that we can get learning result from browser(console echo result):
+
+<img src="./mdp_learn_result.png">
+
+---
 # Pavlov.js
 
 <img src="./MDP.png">
